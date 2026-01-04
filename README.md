@@ -2,6 +2,8 @@
 
 ### A versatile spreadsheet library for Angular
 
+[**Live Demo / Documentation**](https://oatear.github.io/longtable/)
+
 Longtable is a feature-rich, standalone spreadsheet component built for modern, zoneless Angular applications. It provides a powerful and familiar spreadsheet experience with a simple and declarative API.
 
 This library was designed to be highly interactive and performant, leveraging Angular signals for state management.
