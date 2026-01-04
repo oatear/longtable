@@ -1,7 +1,13 @@
 {
   "name": "oatear-longtable",
   "version": "1.0.0",
-  "description": "A feature-rich spreadsheet component built with Angular.",
+  "description": "A feature-rich spreadsheet component built for Angular.",
+  "repository": "https://github.com/oatear/longtable",
+  "author": {
+    "name": "Hristo Iankov",
+    "email": "contact@oatear.com",
+    "url": "https://oatear.com"
+  },
   "private": true,
   "type": "module",
   "scripts": {
