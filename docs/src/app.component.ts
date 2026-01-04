@@ -93,11 +93,11 @@ export class AppComponent implements OnInit {
     }
 
     const docFiles = {
-      introduction: 'assets/docs/introduction.md',
-      features: 'assets/docs/features.md',
-      setup: 'assets/docs/setup.md',
-      dataModels: 'assets/docs/data-models.md',
-      theming: 'assets/docs/theming.md',
+      introduction: 'docs/introduction.md',
+      features: 'docs/features.md',
+      setup: 'docs/setup.md',
+      dataModels: 'docs/data-models.md',
+      theming: 'docs/theming.md',
     };
 
     const parsedDocs = await Promise.all(
