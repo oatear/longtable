@@ -1,3 +1,5 @@
+<div align="center">
+
 # Oatear Longtable
 
 ### A versatile spreadsheet library for Angular
@@ -7,6 +9,18 @@
 Longtable is a feature-rich, standalone spreadsheet component built for modern, zoneless Angular applications. It provides a powerful and familiar spreadsheet experience with a simple and declarative API.
 
 This library was designed to be highly interactive and performant, leveraging Angular signals for state management.
+
+[![][license]][license-url] 
+[![][stars]][gh-url]
+[![][release]][releases-url]
+[![][downloads]][releases-url]
+[![][last-commit]][gh-url]
+[![][website]][pages-url]
+[![][discord]][discord-url]
+
+</div>
+
+---
 
 ## Features
 
@@ -164,3 +178,20 @@ To build the documentation site:
 npm run build:demo
 ```
 Artifacts will be generated in `dist/docs`.
+
+<!-- BADGE & IMAGE DEFINITIONS -->
+[last-commit]: https://img.shields.io/github/last-commit/oatear/longtable
+[license]: https://badgen.net/github/license/oatear/longtable?cache=600
+[stars]: https://img.shields.io/github/stars/oatear/longtable
+[release]: https://img.shields.io/github/v/release/oatear/longtable
+[discord]: https://img.shields.io/discord/1129380421642240133?logo=discord&label=discord&color=%23515fe4&link=https%3A%2F%2Fdiscord.gg%2FS66xw9Wc9V
+[downloads]: https://img.shields.io/github/downloads/oatear/longtable/total
+[website]: https://img.shields.io/website?down_color=red&down_message=offline&up_color=green&up_message=online&url=https%3A%2F%2Foatear.github.io%2Flongtable
+
+<!-- URL DEFINITIONS -->
+[gh-url]: https://github.com/oatear/longtable
+[releases-url]: https://github.com/oatear/longtable/releases
+[license-url]: LICENSE.md
+[pages-url]: https://oatear.github.io/longtable
+[discord-url]: https://discord.gg/S66xw9Wc9V
+[kofi-url]: https://ko-fi.com/oatear
