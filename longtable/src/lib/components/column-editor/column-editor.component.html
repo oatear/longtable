@@ -1,0 +1,87 @@
+@if (isVisible() && form(); as formState) {
+    <div class="fixed inset-0 bg-black/20 backdrop-blur-[10px] z-[110] flex items-center justify-center p-4">
+        <div class="rounded-[10px] shadow-xl w-full max-w-md border border-[var(--lt-popup-border,theme(colors.slate.200))] flex flex-col max-h-full" (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()" [style.background]="'var(--lt-popup-bg, white)'">
+            
+            <div class="p-6 pb-4 flex items-center justify-between flex-shrink-0">
+                <h3 class="font-medium leading-6 text-[var(--lt-text-primary,theme(colors.gray.900))]" [style.fontSize]="'var(--lt-font-modal-title, 18px)'">
+                    Column Settings for '{{ columnConfig()()[columnIndex()!].name }}'
+                </h3>
+                <button (click)="close.emit()" type="button" class="p-2 -m-2 rounded-full text-[var(--lt-icon-default,theme(colors.gray.500))] hover:bg-[var(--lt-icon-hover-bg,theme(colors.slate.200))]">
+                  <i class="pi pi-times"></i>
+                </button>
+            </div>
+            
+            <div class="px-6 pb-6 space-y-4 overflow-y-auto modal-scroll-content flex-grow">
+                <div>
+                    <label for="colName" class="block font-medium text-[var(--lt-text-primary,theme(colors.gray.700))]" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">Column Name</label>
+                    <input type="text" id="colName" [(ngModel)]="formState.name" (keydown)="$event.stopPropagation()" class="mt-1 block w-full px-3 py-2 bg-[var(--lt-input-bg,white)] border border-transparent hover:border-[var(--lt-border-default,theme(colors.slate.300))] rounded-[10px] shadow-sm placeholder-slate-400 focus:outline-none focus:border-[var(--lt-border-editing,theme(colors.blue.500))] focus:ring-1 focus:ring-[var(--lt-border-editing,theme(colors.blue.500))] text-[var(--lt-text-primary,inherit)]" [style.fontSize]="'var(--lt-font-input, 14px)'">
+                </div>
+
+                <div>
+                    <label for="colDescription" class="block font-medium text-[var(--lt-text-primary,theme(colors.gray.700))]" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">Description</label>
+                    <textarea id="colDescription" [(ngModel)]="formState.description" (keydown)="$event.stopPropagation()" rows="2" class="mt-1 block w-full px-3 py-2 bg-[var(--lt-input-bg,white)] border border-transparent hover:border-[var(--lt-border-default,theme(colors.slate.300))] rounded-[10px] shadow-sm placeholder-slate-400 focus:outline-none focus:border-[var(--lt-border-editing,theme(colors.blue.500))] focus:ring-1 focus:ring-[var(--lt-border-editing,theme(colors.blue.500))] text-[var(--lt-text-primary,inherit)] resize-none" placeholder="Optional: Describe the column's purpose" [style.fontSize]="'var(--lt-font-input, 14px)'"></textarea>
+                </div>
+
+                <div>
+                    <label for="colType" class="block font-medium text-[var(--lt-text-primary,theme(colors.gray.700))]" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">Column Type</label>
+                    <select id="colType" [(ngModel)]="formState.type" class="mt-1 block w-full pl-3 pr-10 py-2 border border-transparent hover:border-[var(--lt-border-default,theme(colors.slate.300))] focus:outline-none focus:ring-[var(--lt-border-editing,theme(colors.blue.500))] focus:border-[var(--lt-border-editing,theme(colors.blue.500))] rounded-[10px] bg-[var(--lt-input-bg,white)] text-[var(--lt-text-primary,inherit)]" [style.fontSize]="'var(--lt-font-input, 14px)'">
+                        <option value="text">Text</option>
+                        <option value="numeric">Numeric</option>
+                        <option value="checkbox">Checkbox</option>
+                        <option value="dropdown">Dropdown</option>
+                    </select>
+                </div>
+
+                @if (formState.type === 'dropdown') {
+                  <div>
+                    <div class="flex justify-between items-center">
+                        <label class="block font-medium text-[var(--lt-text-primary,theme(colors.gray.700))]" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">Dropdown Options</label>
+                        <button (click)="inferOptions()" type="button" class="text-[var(--lt-icon-active,theme(colors.blue.600))] hover:underline flex items-center gap-1.5 px-2 py-1 rounded-[10px] hover:bg-[var(--lt-icon-hover-bg,theme(colors.slate.100))]" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">
+                            <i class="pi pi-magic-wand"></i>
+                            <span>Infer from column</span>
+                        </button>
+                    </div>
+                    <div class="mt-1 space-y-2 max-h-40 overflow-y-auto pr-2 modal-scroll-content">
+                        @for (option of formState.options; track $index) {
+                            <div class="flex items-center gap-2">
+                                <div class="relative h-8 w-8 flex-shrink-0">
+                                    <input #colorInput type="color" [(ngModel)]="option.color" class="absolute invisible w-0 h-0 opacity-0">
+                                    <button type="button" 
+                                            [style.backgroundColor]="option.color" 
+                                            (click)="colorInput.click()" 
+                                            class="w-full h-full rounded-[10px] border border-[var(--lt-border-default,theme(colors.slate.300))] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--lt-border-editing,theme(colors.blue.500))]">
+                                    </button>
+                                </div>
+                                <input type="text" [(ngModel)]="option.value" (keydown)="$event.stopPropagation()" class="block w-full px-3 py-2 bg-[var(--lt-input-bg,white)] border border-transparent hover:border-[var(--lt-border-default,theme(colors.slate.300))] rounded-[10px] shadow-sm focus:outline-none focus:border-[var(--lt-border-editing,theme(colors.blue.500))] focus:ring-1 focus:ring-[var(--lt-border-editing,theme(colors.blue.500))] text-[var(--lt-text-primary,inherit)]" placeholder="Option value" [style.fontSize]="'var(--lt-font-input, 14px)'">
+                                <button (click)="removeOption($index)" class="p-2 rounded-full text-[var(--lt-icon-default,theme(colors.gray.500))] hover:bg-[var(--lt-icon-hover-bg,theme(colors.slate.200))]">
+                                    <i class="pi pi-times"></i>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                    <button (click)="addOption()" class="mt-2 text-[var(--lt-icon-active,theme(colors.blue.600))] hover:underline" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">+ Add another option</button>
+                  </div>
+                }
+
+                <div>
+                    <label for="colWidth" class="block font-medium text-[var(--lt-text-primary,theme(colors.gray.700))]" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">Column Width</label>
+                    <div class="relative mt-1">
+                      <input type="number" id="colWidth" [(ngModel)]="formState.widthValue" (keydown)="$event.stopPropagation()" min="60" class="block w-full px-3 py-2 bg-[var(--lt-input-bg,white)] border border-transparent hover:border-[var(--lt-border-default,theme(colors.slate.300))] rounded-[10px] shadow-sm placeholder-slate-400 focus:outline-none focus:border-[var(--lt-border-editing,theme(colors.blue.500))] focus:ring-1 focus:ring-[var(--lt-border-editing,theme(colors.blue.500))] text-[var(--lt-text-primary,inherit)] pr-12" placeholder="Default (135)" [style.fontSize]="'var(--lt-font-input, 14px)'">
+                      <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <span class="text-gray-500 dark:text-slate-400" [style.fontSize]="'var(--lt-font-input, 14px)'">px</span>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 pt-4 flex justify-end gap-3 flex-shrink-0">
+                <button (click)="close.emit()" type="button" class="px-4 py-2 font-medium text-[var(--lt-text-primary,theme(colors.gray.700))] bg-[var(--lt-popup-bg,white)] border border-[var(--lt-border-default,theme(colors.slate.300))] rounded-[10px] shadow-sm hover:bg-[var(--lt-icon-hover-bg,theme(colors.gray.50))] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--lt-border-editing,theme(colors.blue.500))]" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">
+                  Cancel
+                </button>
+                <button (click)="onSave()" type="button" class="px-4 py-2 font-medium text-[var(--lt-button-primary-text,white)] bg-[var(--lt-button-primary-bg,theme(colors.blue.600))] hover:bg-[var(--lt-button-primary-bg-hover,theme(colors.blue.700))] border border-transparent rounded-[10px] shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--lt-button-primary-bg,theme(colors.blue.500))] focus:ring-offset-[var(--lt-popup-bg,white)]" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">
+                  Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Angular Spreadsheet Library",
+  "description": "A feature-rich spreadsheet component built with Angular. It supports multi-select, copy/paste from external sources, drag-to-fill, cell dropdowns, and full CRUD operations. This app serves as a demonstration of the reusable spreadsheet component.",
+  "requestFramePermissions": [
+    "clipboard-read"
+  ]
+}

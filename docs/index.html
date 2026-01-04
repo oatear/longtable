@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Oatear Longtable</title>
+  <base href="/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" href="https://unpkg.com/primeicons/primeicons.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  <style>
+    /* GitHub-like markdown styling */
+    .markdown-body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+      font-size: 16px;
+      line-height: 1.5;
+      word-wrap: break-word;
+      color: #24292f;
+    }
+
+    .dark .markdown-body {
+      color: #c9d1d9;
+    }
+
+    .markdown-body h1,
+    .markdown-body h2 {
+      border-bottom: 1px solid #d0d7de;
+      padding-bottom: .3em;
+      margin-top: 24px;
+      margin-bottom: 16px;
+    }
+
+    .dark .markdown-body h1,
+    .dark .markdown-body h2 {
+      border-bottom-color: #30363d;
+    }
+
+    .markdown-body h1 {
+      font-size: 2em;
+      font-weight: 600;
+    }
+
+    .markdown-body h2 {
+      font-size: 1.5em;
+      font-weight: 600;
+    }
+
+    .markdown-body h3 {
+      font-size: 1.25em;
+      font-weight: 600;
+    }
+
+    .markdown-body h4 {
+      font-size: 1em;
+      font-weight: 600;
+    }
+
+    .markdown-body h3,
+    .markdown-body h4,
+    .markdown-body h5,
+    .markdown-body h6 {
+      margin-bottom: 16px;
+      margin-top: 24px;
+    }
+
+
+    .markdown-body p {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    .markdown-body a {
+      color: #0969da;
+      text-decoration: none;
+    }
+
+    .dark .markdown-body a {
+      color: #58a6ff;
+    }
+
+    .markdown-body a:hover {
+      text-decoration: underline;
+    }
+
+    .markdown-body ul,
+    .markdown-body ol {
+      padding-left: 2em;
+      margin-bottom: 16px;
+    }
+
+    .markdown-body li {
+      margin-bottom: .25em;
+    }
+
+    .markdown-body blockquote {
+      margin-left: 0;
+      padding: 0 1em;
+      color: #57606a;
+      border-left: .25em solid #d0d7de;
+      margin-bottom: 16px;
+    }
+
+    .dark .markdown-body blockquote {
+      color: #8b949e;
+      border-left-color: #30363d;
+    }
+
+    .markdown-body pre {
+      padding: 16px;
+      overflow: auto;
+      font-size: 85%;
+      line-height: 1.45;
+      background-color: #f6f8fa;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .dark .markdown-body pre {
+      background-color: rgb(53, 61, 72);
+    }
+
+    .markdown-body code {
+      font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+      padding: .2em .4em;
+      margin: 0;
+      font-size: 85%;
+      background-color: rgba(175, 184, 193, 0.2);
+      border-radius: 6px;
+    }
+
+    .dark .markdown-body code {
+      background-color: rgb(53, 61, 72);
+    }
+
+    .markdown-body pre code {
+      padding: 0;
+      margin: 0;
+      font-size: 100%;
+      background-color: transparent;
+      border-radius: 0;
+    }
+
+    .markdown-body kbd {
+      display: inline-block;
+      padding: 3px 5px;
+      font: 11px ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+      line-height: 10px;
+      color: #24292f;
+      vertical-align: middle;
+      background-color: #f6f8fa;
+      border: solid 1px #d0d7de;
+      border-bottom-color: #c6cbd1;
+      border-radius: 6px;
+      box-shadow: inset 0 -1px 0 #c6cbd1;
+    }
+
+    .dark .markdown-body kbd {
+      color: #c9d1d9;
+      background-color: #161b22;
+      border-color: #30363d;
+      box-shadow: inset 0 -1px 0 #30363d;
+    }
+
+    /* Custom page scrollbar */
+    ::-webkit-scrollbar {
+      width: 14px;
+      height: 14px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #ffffff;
+      /* Page background */
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      /* slate-300, matches longLight theme scrollbar thumb */
+      border-radius: 7px;
+      border: 4px solid #ffffff;
+      /* Creates padding effect, matches track */
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: #94a3b8;
+      /* slate-400, matches longLight theme scrollbar thumb hover */
+    }
+
+    .dark ::-webkit-scrollbar-track {
+      background: #0d1117;
+      /* Page background */
+    }
+
+    .dark ::-webkit-scrollbar-thumb {
+      background-color: #4f5b6b;
+      /* matches longDark theme scrollbar thumb */
+      border-color: #0d1117;
+      /* Match track color */
+    }
+
+    .dark ::-webkit-scrollbar-thumb:hover {
+      background-color: #647080;
+      /* matches longDark theme scrollbar thumb hover */
+    }
+
+    /* Custom scrollbar for code blocks */
+    .markdown-body pre::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .markdown-body pre::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border: 4px solid transparent;
+    }
+
+    .markdown-body pre::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .dark .markdown-body pre::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .dark .markdown-body pre::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script type="module" src="/index.tsx"></script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+
+<body class="bg-white dark:bg-[#0d1117]">
+  <app-root></app-root>
+</body>
+
+</html>

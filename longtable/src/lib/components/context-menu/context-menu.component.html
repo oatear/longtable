@@ -1,0 +1,76 @@
+@if (isVisible()) {
+    @let pos = position();
+    <div 
+        (mousedown)="$event.stopPropagation()"
+        class="w-56 rounded-[10px] shadow-lg border border-[var(--lt-popup-border)] z-[120] py-1"
+        [class.absolute]="appendTo() !== 'body'"
+        [class.fixed]="appendTo() === 'body'"
+        [style.left]="pos.x + 'px'"
+        [style.top]="pos.y + 'px'"
+        [style.background]="'var(--lt-popup-bg)'">
+      
+      @if (type() === 'headerCorner') {
+        <button (click)="emit('openStatsModal')" title="Analyze column distributions and correlations." class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-chart-bar"></i><span class="ml-2">Table Stats</span>
+        </button>
+        <div class="my-1 h-px bg-[var(--lt-border-default)]"></div>
+        <button (click)="emit('copyTableData')" title="Copy the current view (including filters and sort order) as TSV." class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-table"></i><span class="ml-2">Copy Table Data</span>
+        </button>
+        <button (click)="emit('intelligentReplaceTableData')" title="Paste data and intelligently match columns by header name." class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-sparkles"></i><span class="ml-2">Intelligent Paste / Replace</span>
+        </button>
+        <button (click)="emit('openFindReplace')" title="Find and replace text within the spreadsheet." class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+            <i class="pi pi-search"></i><span class="ml-2">Find & Replace</span>
+        </button>
+        <div class="my-1 h-px bg-[var(--lt-border-default)]"></div>
+        <button (click)="emit('importCSV')" title="Import a CSV file, intelligently matching columns." class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-upload"></i><span class="ml-2">Import from CSV</span>
+        </button>
+        <button (click)="emit('exportCSV')" title="Export the current view (including filters and sort order) to a CSV file." class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-download"></i><span class="ml-2">Export to CSV</span>
+        </button>
+      }
+
+      @if (type() === 'row' || type() === 'cell') {
+        <button (click)="emit('insertRowAbove')" class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-arrow-up"></i><span class="ml-2">{{ data().insertRowsAboveText }}</span>
+        </button>
+        <button (click)="emit('insertRowBelow')" class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-arrow-down"></i><span class="ml-2">{{ data().insertRowsBelowText }}</span>
+        </button>
+        <div class="my-1 h-px bg-[var(--lt-border-default)]"></div>
+        <button (click)="emit('deleteRows')" [disabled]="!data().canDeleteRows" class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-trash"></i><span class="ml-2">{{ data().deleteRowText }}</span>
+        </button>
+        <div class="my-1 h-px bg-[var(--lt-border-default)]"></div>
+      }
+
+      @if (type() === 'col') {
+        <button (click)="emit('openColumnSettings')" class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-cog"></i><span class="ml-2">Column Settings</span>
+        </button>
+        <div class="my-1 h-px bg-[var(--lt-border-default)]"></div>
+        <button (click)="emit('insertColumnLeft')" [disabled]="data().isInsertColumnActionReadOnly" class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-arrow-left"></i><span class="ml-2">Insert column left</span>
+        </button>
+        <button (click)="emit('insertColumnRight')" [disabled]="data().isInsertColumnActionReadOnly" class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-arrow-right"></i><span class="ml-2">Insert column right</span>
+        </button>
+         <button (click)="emit('deleteColumn')" [disabled]="data().isDeleteColumnActionReadOnly || !data().canDeleteCols" class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-trash"></i><span class="ml-2">{{ data().deleteColText }}</span>
+        </button>
+        <div class="my-1 h-px bg-[var(--lt-border-default)]"></div>
+      }
+
+      @if (type() !== 'headerCorner') {
+        <button (click)="emit('copy')" class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-copy"></i><span class="ml-2">Copy</span>
+        </button>
+
+        <button (click)="emit('paste')" class="w-full text-left px-4 py-2 text-[var(--lt-text-primary)] hover:bg-[var(--lt-icon-hover-bg)] flex items-center" [style.fontSize]="'var(--lt-font-context-menu, 14px)'">
+          <i class="pi pi-clipboard"></i><span class="ml-2">Paste</span>
+        </button>
+      }
+    </div>
+}

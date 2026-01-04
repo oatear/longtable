@@ -1,2 +1,164 @@
-# longtable
-A feature-rich Angular spreadsheet library
+# Oatear Longtable
+
+### A versatile spreadsheet library for Angular
+
+Longtable is a feature-rich, standalone spreadsheet component built for modern, zoneless Angular applications. It provides a powerful and familiar spreadsheet experience with a simple and declarative API.
+
+This library was designed to be highly interactive and performant, leveraging Angular signals for state management.
+
+## Features
+
+- **Rich Data Editing**: Double-click or type to edit cells.
+- **Data Types**: Support for text, numeric, checkbox, and dropdown cells.
+- **Multi-Select**: Click and drag to select ranges of cells.
+- **Copy & Paste**: Seamlessly copy/paste data to and from external applications like Excel or Google Sheets.
+- **Drag-to-Fill**: Easily fill data down or across a range.
+- **Column Operations**: Resize, reorder, and configure columns.
+- **Row Operations**: Insert and delete single or multiple rows.
+- **Undo/Redo**: Full history tracking for data changes.
+- **Sorting & Filtering**: Built-in UI for sorting and filtering columns.
+- **Context Menu**: Intuitive right-click menu for common actions.
+- **Data Analysis**: An integrated statistics modal for data distribution and correlation analysis.
+- **Theming**: Includes light and dark mode support.
+
+## Installation & Setup
+
+As this is a local library within the project, no separate installation is needed. Simply import the necessary components and models from the `src/longtable` directory.
+
+1.  **Import the component**: In your component file, import `SpreadsheetComponent` and the required data models.
+
+    ```typescript
+    import { SpreadsheetComponent, Cell, ColumnConfig } from './longtable';
+    ```
+
+2.  **Add to template**: Use the `<long-spreadsheet>` selector in your component's template.
+
+## Basic Usage
+
+To use the Longtable spreadsheet, you need to provide two main inputs: `data` and `columnConfig`, both as Angular `WritableSignal`s. You can also listen for changes using the `onDataChange` and `onColumnChange` outputs.
+
+### `app.component.ts`
+
+```typescript
+import { Component, signal, WritableSignal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SpreadsheetComponent, Cell, ColumnConfig } from './longtable';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, SpreadsheetComponent],
+  template: `
+    <main class="p-4">
+      <h1 class="text-2xl font-bold mb-4">My Longtable Spreadsheet</h1>
+      <long-spreadsheet 
+        [data]="initialData" 
+        [columnConfig]="columnConfig"
+        (onDataChange)="onDataChanged($event)"
+        (onColumnChange)="onColumnConfigChanged($event)">
+      </long-spreadsheet>
+    </main>
+  `,
+})
+export class AppComponent {
+
+  // The core data for the spreadsheet grid. Does not include headers.
+  initialData: WritableSignal<Cell[][]> = signal([
+    [{ value: 'Jane Doe' }, { value: 'Developer' }, { value: true }],
+    [{ value: 'John Smith' }, { value: 'Designer' }, { value: false }],
+  ]);
+
+  // Configuration for each column, including header names.
+  columnConfig: WritableSignal<ColumnConfig[]> = signal([
+    { name: 'Name', field: 'name', width: 200 },
+    { name: 'Role', field: 'role', width: 150 },
+    { name: 'Active', field: 'active', width: 80, editor: 'checkbox' },
+  ]);
+
+  onDataChanged(data: Cell[][]) {
+    console.log('Spreadsheet data has changed:', data);
+  }
+
+  onColumnConfigChanged(config: ColumnConfig[]) {
+    console.log('Column configuration has changed:', config);
+  }
+}
+```
+
+## API
+
+### Inputs
+
+| Input          | Type                                | Description                                                                                                                              |
+| -------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`         | `WritableSignal<Cell[][]>`         | **Required**. The 2D array of `Cell` objects that represents the spreadsheet grid's data rows.                                             |
+| `columnConfig` | `WritableSignal<ColumnConfig[]>` | **Required**. An array of configuration objects, one for each column, controlling properties like headers, width, and cell editors. |
+
+### Outputs
+
+| Output           | Payload Type        | Description                                                          |
+| ---------------- | ------------------- | -------------------------------------------------------------------- |
+| `onDataChange`   | `Cell[][]`          | Emits the entire data grid whenever a change to the data occurs.     |
+| `onColumnChange` | `ColumnConfig[]`    | Emits the entire column configuration whenever it is changed. |
+
+## Data Models
+
+### `Cell` Interface
+
+The `Cell` object defines the content and behavior of a single cell.
+
+```typescript
+interface Cell {
+  value: string | number | boolean;
+  readOnly?: boolean;
+}
+```
+
+### `ColumnConfig` Interface
+
+The `ColumnConfig` object defines metadata for an entire column.
+
+```typescript
+interface ColumnConfig {
+  name: string;
+  field: string;
+  readOnly?: boolean;
+  width?: number | 'auto';
+  description?: string;
+  editor?: 'text' | 'dropdown' | 'checkbox' | 'numeric';
+  options?: (string | DropdownOption)[];
+}
+
+interface DropdownOption {
+  value: string;
+  color: string; // Hex color string
+}
+```
+
+## Development
+
+This project involves two main parts:
+- `longtable`: The Angular library.
+- `docs`: The demonstration and documentation application.
+
+### Library
+
+To build the library:
+```bash
+npm run build:lib
+```
+Artifacts will be generated in `dist/longtable`.
+
+### Documentation / Demo
+
+To run the documentation site locally:
+```bash
+npm run start
+```
+This serves the application at `http://localhost:4200/`.
+
+To build the documentation site:
+```bash
+npm run build:demo
+```
+Artifacts will be generated in `dist/docs`.

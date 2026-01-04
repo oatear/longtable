@@ -1,0 +1,61 @@
+@if (isVisible()) {
+  @let pos = position();
+  <div 
+      (click)="$event.stopPropagation()"
+      (mousedown)="$event.stopPropagation()"
+      class="absolute z-[100] w-64 rounded-[10px] shadow-lg border border-[var(--lt-popup-border,theme(colors.slate.200))] p-3 flex flex-col"
+      [style.left]="pos.left"
+      [style.top]="pos.top"
+      [style.display]="pos.display"
+      [style.background]="'var(--lt-popup-bg, white)'">
+
+      <div class="flex items-center justify-between pb-2 mb-2 border-b border-[var(--lt-border-default,theme(colors.slate.200))]">
+        <h4 class="font-semibold text-[var(--lt-text-primary,theme(colors.gray.800))]" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">Filter by value</h4>
+        <button (click)="close.emit()" class="p-1 -m-1 rounded-full text-[var(--lt-icon-default,theme(colors.gray.500))] hover:bg-[var(--lt-icon-hover-bg,theme(colors.slate.200))]">
+          <i class="pi pi-times text-[14px]"></i>
+        </button>
+      </div>
+
+      <input 
+        type="text" 
+        [value]="searchText()"
+        (input)="searchText.set($any($event.target).value)"
+        (keydown)="$event.stopPropagation()"
+        class="w-full px-2 py-1 border border-transparent hover:border-[var(--lt-border-default,theme(colors.slate.300))] rounded-[10px] shadow-sm focus:outline-none focus:ring-[var(--lt-border-editing,theme(colors.blue.500))] focus:border-[var(--lt-border-editing,theme(colors.blue.500))] bg-[var(--lt-input-bg,white)] text-[var(--lt-text-primary,inherit)]"
+        placeholder="Search values..."
+        [style.fontSize]="'var(--lt-font-input, 14px)'">
+      
+      <div class="flex justify-between items-center my-2">
+          <button (click)="selectAll()" class="text-[var(--lt-icon-active,theme(colors.blue.600))] hover:underline" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">Select All</button>
+          <button (click)="clearAll()" class="text-[var(--lt-icon-active,theme(colors.blue.600))] hover:underline" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">Clear</button>
+      </div>
+
+      <div class="flex-grow overflow-y-auto max-h-48 border-t border-b border-[var(--lt-border-default,theme(colors.slate.200))] py-1 -mx-3 px-3 modal-scroll-content">
+          @for (value of displayedValues(); track value) {
+              <label 
+                  class="flex items-center p-1.5 rounded-[10px] cursor-pointer"
+                  [class]="tempSelection().has(value) ? 'bg-[var(--lt-bg-selection,theme(colors.blue.100))]' : 'hover:bg-[var(--lt-icon-hover-bg,theme(colors.slate.100))]'">
+                  <input 
+                      type="checkbox"
+                      class="h-4 w-4 rounded border border-[var(--lt-checkbox-border,theme(colors.slate.300))] focus:ring-[var(--lt-icon-active,theme(colors.blue.600))] bg-[var(--lt-checkbox-bg,white)] accent-[var(--lt-icon-active,theme(colors.blue.600))]"
+                      [checked]="tempSelection().has(value)"
+                      (change)="toggleValueSelection(value)">
+                  <span 
+                      class="ml-2 truncate"
+                      [style.fontSize]="'var(--lt-font-modal-content, 14px)'"
+                      [class]="tempSelection().has(value) ? 'font-semibold text-[var(--lt-text-selection,theme(colors.blue.800))]' : 'text-[var(--lt-text-primary,theme(colors.gray.700))]'"
+                  >{{ value || '(Blanks)' }}</span>
+              </label>
+          }
+      </div>
+      
+      <div class="flex justify-end gap-2 mt-3">
+          <button (click)="clear.emit()" class="px-3 py-1 text-[var(--lt-text-primary,theme(colors.gray.700))] hover:bg-[var(--lt-icon-hover-bg,theme(colors.gray.100))] rounded-[10px] border border-[var(--lt-border-default,theme(colors.slate.300))]" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">
+              Clear Filter
+          </button>
+          <button (click)="onApply()" class="px-3 py-1 text-[var(--lt-button-primary-text,white)] bg-[var(--lt-button-primary-bg,theme(colors.blue.600))] hover:bg-[var(--lt-button-primary-bg-hover,theme(colors.blue.700))] rounded-[10px] border border-transparent" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">
+              Apply
+          </button>
+      </div>
+  </div>
+}

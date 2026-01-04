@@ -1,0 +1,45 @@
+@if (isVisible()) {
+    <div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+        <div class="stats-modal-panel rounded-[10px] shadow-xl w-full max-w-6xl max-h-full flex flex-col border border-[var(--lt-popup-border,theme(colors.slate.200))]" (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()" [style.background]="'var(--lt-popup-bg, white)'">
+            <header class="flex items-center justify-between p-4">
+                <h3 class="font-medium leading-6 text-[var(--lt-text-primary,theme(colors.gray.900))]" [style.fontSize]="'var(--lt-font-modal-large-title, 20px)'">Table Statistics</h3>
+                @if (countColumnIndex() > -1) {
+                  <label class="flex items-center gap-2 text-[var(--lt-text-primary,theme(colors.gray.700))] cursor-pointer" [style.fontSize]="'var(--lt-font-modal-content, 14px)'">
+                    <input type="checkbox" [checked]="useCountColumn()()" (change)="useCountColumn().set($any($event.target).checked)" class="h-4 w-4 rounded border border-[var(--lt-checkbox-border,theme(colors.slate.300))] focus:ring-[var(--lt-icon-active,theme(colors.blue.600))] bg-[var(--lt-checkbox-bg,white)] accent-[var(--lt-icon-active,theme(colors.blue.600))]">
+                    <span>Multiply by 'Count' column</span>
+                  </label>
+                }
+                <button (click)="close.emit()" type="button" class="p-2 -m-2 rounded-full text-[var(--lt-icon-default,theme(colors.gray.500))] hover:bg-[var(--lt-icon-hover-bg,theme(colors.slate.200))]">
+                  <i class="pi pi-times"></i>
+                </button>
+            </header>
+            
+            <div class="flex-grow p-6 overflow-y-auto modal-scroll-content">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    @for(graph of graphs(); track $index) {
+                      @switch (graph.type) {
+                        @case ('distribution') {
+                          @let distIndex = getDistributionIndex($index);
+                          <long-distribution-analysis
+                            [rows]="rows()"
+                            [useCountColumn]="useCountColumn()()"
+                            [initialAnalysisField]="initialAnalysisFields()[distIndex]"
+                            [state]="graph.state"
+                            [columnConfig]="columnConfig()">
+                          </long-distribution-analysis>
+                        }
+                        @case ('correlation') {
+                          <long-correlation-analysis
+                            [rows]="rows()"
+                            [useCountColumn]="useCountColumn()()"
+                            [state]="graph.state"
+                            [columnConfig]="columnConfig()">
+                          </long-correlation-analysis>
+                        }
+                      }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
