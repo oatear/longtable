@@ -131,7 +131,10 @@ export class AppComponent implements OnInit {
       'Finnian Stoutheart', 'Gwendolyn Silverbow', 'Hadrian Stormcaller', 'Isolde Whisperwind', 'Joric Stonefist',
       'Kaelen Shadowhand', 'Lyra Starfall', 'Morwen Darkwater', 'Niall Riverbend', 'Orin Blackwood',
       'Perrin Greenleaf', 'Quintus Valerius', 'Rhiannon Frostbloom', 'Seraphina Brightwood', 'Taran Oakenshield',
-      'Grommash Hellscream'
+      'Grommash Hellscream', 'Hestia Moonshadow', 'Ingrid Frostbite', 'Jasper Thunderheart', 'Kira Sunbeam',
+      'Liam Frostbite', 'Morgan Thunderheart', 'Natalie Sunbeam', 'Oliver Frostbite', 'Piper Thunderheart',
+      'Quinn Sunbeam', 'Rebekah Frostbite', 'Sebastian Thunderheart', 'Talia Sunbeam', 'Uriah Frostbite',
+      'Valentina Thunderheart', 'Wyatt Sunbeam', 'Xander Frostbite', 'Yara Thunderheart', 'Zachary Sunbeam',
     ];
 
     for (let i = 0; i < rows; i++) {
