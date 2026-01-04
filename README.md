@@ -37,9 +37,61 @@ This library was designed to be highly interactive and performant, leveraging An
 - **Data Analysis**: An integrated statistics modal for data distribution and correlation analysis.
 - **Theming**: Includes light and dark mode support.
 
-## Installation & Setup
+## Installation
 
-As this is a local library within the project, no separate installation is needed. Simply import the necessary components and models from the `src/longtable` directory.
+Since this library is not yet published to the npm registry, you must build it locally and install it as a file dependency.
+
+### Method 1: Install via Tarball (Recommended)
+This method "packages" the library with your project, ensuring stability.
+
+1.  **Clone and Build**:
+    ```bash
+    git clone https://github.com/oatear/longtable.git
+    cd longtable
+    npm install
+    npm run build:lib
+    ```
+
+2.  **Create Package**:
+    ```bash
+    cd dist/longtable
+    npm pack
+    ```
+    This creates a file like `oatear-longtable-1.0.0.tgz`.
+
+3.  **Install in Your Project**:
+    Move the `.tgz` file to your project (e.g., into a `libs/` folder) and install it:
+    ```bash
+    npm install ./libs/oatear-longtable-1.0.0.tgz
+    ```
+
+### Method 2: Install via Local Path
+Useful if you want to keep the library source separate on your machine.
+```bash
+npm install /path/to/longtable/dist/longtable
+```
+
+### Method 3: npm link (Active Development)
+Use this if you are actively modifying the library and want changes to reflect immediately in your app.
+
+1.  **Link Library**:
+    ```bash
+    cd dist/longtable
+    npm link
+    ```
+
+2.  **Link in App**:
+    ```bash
+    cd my-app
+    npm link oatear-longtable
+    ```
+
+---
+
+## Running the Demo Locally
+
+Since this repository contains both the library and a demo application, you can run it immediately to test features.
+
 
 1.  **Import the component**: In your component file, import `SpreadsheetComponent` and the required data models.
 
