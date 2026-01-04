@@ -86,21 +86,6 @@ Use this if you are actively modifying the library and want changes to reflect i
     npm link oatear-longtable
     ```
 
----
-
-## Running the Demo Locally
-
-Since this repository contains both the library and a demo application, you can run it immediately to test features.
-
-
-1.  **Import the component**: In your component file, import `SpreadsheetComponent` and the required data models.
-
-    ```typescript
-    import { SpreadsheetComponent, Cell, ColumnConfig } from './longtable';
-    ```
-
-2.  **Add to template**: Use the `<long-spreadsheet>` selector in your component's template.
-
 ## Basic Usage
 
 To use the Longtable spreadsheet, you need to provide two main inputs: `data` and `columnConfig`, both as Angular `WritableSignal`s. You can also listen for changes using the `onDataChange` and `onColumnChange` outputs.
