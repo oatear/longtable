@@ -2,7 +2,7 @@
 
 # Oatear Longtable
 
-### A versatile spreadsheet library for Angular
+### A feature-rich spreadsheet component built for Angular
 
 [**Live Demo / Documentation**](https://oatear.github.io/longtable/)
 
