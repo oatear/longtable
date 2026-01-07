@@ -15,7 +15,7 @@ import { TableStatsComponent } from '../table-stats/table-stats.component';
   templateUrl: './spreadsheet.component.html',
   styleUrls: [], // No separate styles, using Tailwind in HTML
   imports: [
-    CommonModule, 
+    CommonModule,
     FormsModule,
     ContextMenuComponent,
     ColumnEditorComponent,
@@ -38,11 +38,11 @@ import { TableStatsComponent } from '../table-stats/table-stats.component';
 export class SpreadsheetComponent implements OnDestroy {
   data = input.required<WritableSignal<Cell[][]>>();
   columnConfig = input.required<WritableSignal<ColumnConfig[]>>();
-  theme = input<SpreadsheetTheme | null>(null);
+  theme = input.required<SpreadsheetTheme>();
 
   onDataChange = output<Cell[][]>();
   onColumnChange = output<ColumnConfig[]>();
-  
+
   protected readonly uniqueId = `long-spreadsheet-${Math.random().toString(36).substring(2, 9)}`;
 
   // Signals for state management
@@ -54,7 +54,7 @@ export class SpreadsheetComponent implements OnDestroy {
   isSelectingRows = signal(false);
   isSelectingCols = signal(false);
   fillRange = signal<{ start: Coordinates, end: Coordinates } | null>(null);
-  
+
   editValue = signal<string | number | boolean>('');
   editorPosition = signal<{ top: number; left: number; width: number; height: number; } | null>(null);
   private isNewValueEntry = signal(false);
@@ -71,7 +71,7 @@ export class SpreadsheetComponent implements OnDestroy {
   // Sorting and Filtering
   sortConfig = signal<{ col: number, direction: 'asc' | 'desc' } | null>(null);
   filterConfig = signal<Map<number, Set<string>>>(new Map());
-  
+
   // Custom Dropdown Editor State
   dropdownSearchText = signal('');
   dropdownActiveOptionIndex = signal<number>(0);
@@ -101,7 +101,7 @@ export class SpreadsheetComponent implements OnDestroy {
   isColumnSettingsVisible = signal(false);
   isFindReplaceVisible = signal(false);
   isStatsModalVisible = signal(false);
-  activeFilterPopup = signal<{col: number, target: HTMLElement} | null>(null);
+  activeFilterPopup = signal<{ col: number, target: HTMLElement } | null>(null);
 
   // State for child components
   contextMenuPosition = signal({ x: 0, y: 0 });
@@ -144,7 +144,7 @@ export class SpreadsheetComponent implements OnDestroy {
   // Computed properties
   rows = computed(() => this.data()() || []);
   colsCount = computed(() => this.columnConfig()().length || 0);
-  
+
   spreadsheetContainerClasses = computed(() => `w-full h-[60vh] overflow-auto border rounded-[10px] relative select-none focus:outline-none border-[var(--lt-border-default,theme(colors.slate.200))] ${this.uniqueId}`);
 
   themeCssVariables = computed(() => {
@@ -241,7 +241,7 @@ export class SpreadsheetComponent implements OnDestroy {
     if (!editing) return [];
     const colConfig = this.columnConfig()()[editing.col];
     if (colConfig?.editor !== 'dropdown' || !colConfig.options) return [];
-    
+
     const search = this.dropdownSearchText().toLowerCase();
     if (!search) return colConfig.options;
     return colConfig.options.filter(opt => this.getOptionValue(opt).toLowerCase().includes(search));
@@ -296,22 +296,22 @@ export class SpreadsheetComponent implements OnDestroy {
     const ranges = this.selectionRanges();
     const container = this.spreadsheetContainer();
     if (ranges.length === 0 || !container?.nativeElement) return [];
-  
+
     return ranges.map(range => {
       const norm = this.normalizeRange(range);
       const startModel = this.visualToModelCoords(norm.start);
       const endModel = this.visualToModelCoords(norm.end);
       if (!startModel || !endModel) return { display: 'none' };
-  
+
       const startEl = container.nativeElement.querySelector(`td[data-row="${startModel.row}"][data-col="${startModel.col}"]`);
       const endEl = container.nativeElement.querySelector(`td[data-row="${endModel.row}"][data-col="${endModel.col}"]`);
       if (!startEl || !endEl) return { display: 'none' };
-  
+
       const left = startEl.offsetLeft;
       const top = startEl.offsetTop;
       const width = (endEl.offsetLeft + endEl.offsetWidth) - left;
       const height = (endEl.offsetTop + endEl.offsetHeight) - top;
-  
+
       return { display: 'block', left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px` };
     });
   });
@@ -323,7 +323,7 @@ export class SpreadsheetComponent implements OnDestroy {
     const selection = this.selectionRanges()[this.selectionRanges().length - 1];
     const container = this.spreadsheetContainer();
     if (!fill || !selection || !container?.nativeElement) return { display: 'none' };
-  
+
     const normSelection = this.normalizeRange(selection);
     const normFill = this.normalizeRange(fill);
     const startModel = this.visualToModelCoords(normSelection.start);
@@ -333,14 +333,14 @@ export class SpreadsheetComponent implements OnDestroy {
     const startEl = container.nativeElement.querySelector(`td[data-row="${startModel.row}"][data-col="${startModel.col}"]`);
     const endEl = container.nativeElement.querySelector(`td[data-row="${endModel.row}"][data-col="${endModel.col}"]`);
     if (!startEl || !endEl) return { display: 'none' };
-  
+
     const left = startEl.offsetLeft;
     const top = startEl.offsetTop;
     const width = (endEl.offsetLeft + endEl.offsetWidth) - left;
     const height = (endEl.offsetTop + endEl.offsetHeight) - top;
     return { display: 'block', left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px` };
   });
-  
+
   activeSelectionRange = computed(() => {
     const active = this.activeCell();
     const ranges = this.selectionRanges();
@@ -351,7 +351,7 @@ export class SpreadsheetComponent implements OnDestroy {
       return active.row >= norm.start.row && active.row <= norm.end.row && active.col >= norm.start.col && active.col <= norm.end.col;
     }) ?? ranges[ranges.length - 1];
   });
-  
+
   selectedRowCount = computed(() => {
     const selection = this.activeSelectionRange();
     if (!selection) return 0;
@@ -374,26 +374,26 @@ export class SpreadsheetComponent implements OnDestroy {
     const selection = this.activeSelectionRange();
     let isDeleteReadOnly = true;
     if (selection) {
-        const norm = this.normalizeRange(selection);
-        const config = this.columnConfig()();
-        isDeleteReadOnly = false;
-        for (let c = norm.start.col; c <= norm.end.col; c++) {
-            if (config[c]?.readOnly) {
-                isDeleteReadOnly = true;
-                break;
-            }
+      const norm = this.normalizeRange(selection);
+      const config = this.columnConfig()();
+      isDeleteReadOnly = false;
+      for (let c = norm.start.col; c <= norm.end.col; c++) {
+        if (config[c]?.readOnly) {
+          isDeleteReadOnly = true;
+          break;
         }
+      }
     }
 
     return {
-        insertRowsAboveText: rowCount > 1 ? `Insert ${rowCount} rows above` : 'Insert row above',
-        insertRowsBelowText: rowCount > 1 ? `Insert ${rowCount} rows below` : 'Insert row below',
-        deleteRowText: rowCount > 1 ? `Delete ${rowCount} rows` : 'Delete row',
-        deleteColText: colCount > 1 ? `Delete ${colCount} columns` : 'Delete column',
-        isInsertColumnActionReadOnly: colIndex != null ? (this.columnConfig()()[colIndex]?.readOnly ?? false) : false,
-        isDeleteColumnActionReadOnly: isDeleteReadOnly,
-        canDeleteRows: this.rows().length > rowCount,
-        canDeleteCols: this.colsCount() > colCount,
+      insertRowsAboveText: rowCount > 1 ? `Insert ${rowCount} rows above` : 'Insert row above',
+      insertRowsBelowText: rowCount > 1 ? `Insert ${rowCount} rows below` : 'Insert row below',
+      deleteRowText: rowCount > 1 ? `Delete ${rowCount} rows` : 'Delete row',
+      deleteColText: colCount > 1 ? `Delete ${colCount} columns` : 'Delete column',
+      isInsertColumnActionReadOnly: colIndex != null ? (this.columnConfig()()[colIndex]?.readOnly ?? false) : false,
+      isDeleteColumnActionReadOnly: isDeleteReadOnly,
+      canDeleteRows: this.rows().length > rowCount,
+      canDeleteCols: this.colsCount() > colCount,
     };
   });
 
@@ -420,7 +420,7 @@ export class SpreadsheetComponent implements OnDestroy {
     if (!popup) return [];
     const values = new Set<string>();
     this.rows().forEach(row => values.add(String(row[popup.col]?.value ?? '')));
-    return Array.from(values).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
+    return Array.from(values).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   });
 
   filterPopupInitialSelection = computed(() => {
@@ -460,7 +460,7 @@ export class SpreadsheetComponent implements OnDestroy {
     }
     return { display: 'block', left: `${leftPosition - 1}px`, top: `${headerRow.offsetTop}px`, height: `${table.offsetHeight - headerRow.offsetTop}px` };
   });
-  
+
   private renderer = inject(Renderer2);
   private document = inject(DOCUMENT);
   private styleElement: HTMLStyleElement | null = null;
@@ -510,7 +510,7 @@ export class SpreadsheetComponent implements OnDestroy {
 
           const clickX = this.contextMenuPosition().x;
           const clickY = this.contextMenuPosition().y;
-          
+
           const viewportWidth = window.innerWidth;
           const viewportHeight = window.innerHeight;
           const margin = 5;
@@ -528,7 +528,7 @@ export class SpreadsheetComponent implements OnDestroy {
           if (finalY + menuHeight + margin > viewportHeight) {
             finalY = clickY - menuHeight;
           }
-          
+
           // After potential flipping, clamp the position to the viewport boundaries.
           if (finalX < margin) {
             finalX = margin;
@@ -536,7 +536,7 @@ export class SpreadsheetComponent implements OnDestroy {
           if (finalY < margin) {
             finalY = margin;
           }
-          
+
           if (finalX + menuWidth + margin > viewportWidth) {
             finalX = viewportWidth - menuWidth - margin;
           }
@@ -552,19 +552,19 @@ export class SpreadsheetComponent implements OnDestroy {
     effect(() => this.validateData(this.data()()));
     effect(() => { if (this.activeFilterPopup()) setTimeout(() => this.filterPopupEl()?.nativeElement.querySelector('input')?.focus(), 0); });
     effect(() => { if (this.isDraggingColumn()) document.body.style.cursor = 'grabbing'; else document.body.style.cursor = ''; });
-    
+
     // This effect handles resetting the active option index when the user types to filter.
     effect(() => {
-        this.dropdownSearchText(); // Rerun when search text changes.
-        this.dropdownActiveOptionIndex.set(0);
+      this.dropdownSearchText(); // Rerun when search text changes.
+      this.dropdownActiveOptionIndex.set(0);
     });
 
     // This effect handles scrolling the active dropdown option into view when it changes.
     effect(() => {
-        if (this.editingCell() && this.columnConfig()()[this.editingCell()!.col]?.editor === 'dropdown') {
-            this.dropdownActiveOptionIndex(); // Rerun when index changes.
-            this.scrollActiveDropdownOptionIntoView();
-        }
+      if (this.editingCell() && this.columnConfig()()[this.editingCell()!.col]?.editor === 'dropdown') {
+        this.dropdownActiveOptionIndex(); // Rerun when index changes.
+        this.scrollActiveDropdownOptionIntoView();
+      }
     });
 
     effect(() => {
@@ -610,19 +610,19 @@ export class SpreadsheetComponent implements OnDestroy {
 
     // Effect for dynamic scrollbar styling
     effect(() => {
-        const styles = this.scrollbarStyles();
-        const theme = this.theme();
+      const styles = this.scrollbarStyles();
+      const theme = this.theme();
 
-        if (theme && styles) {
-            if (!this.styleElement) {
-                this.styleElement = this.renderer.createElement('style');
-                this.renderer.appendChild(this.document.head, this.styleElement);
-            }
-            this.renderer.setProperty(this.styleElement, 'textContent', styles);
-        } else if (this.styleElement) {
-            this.renderer.removeChild(this.document.head, this.styleElement);
-            this.styleElement = null;
+      if (theme && styles) {
+        if (!this.styleElement) {
+          this.styleElement = this.renderer.createElement('style');
+          this.renderer.appendChild(this.document.head, this.styleElement);
         }
+        this.renderer.setProperty(this.styleElement, 'textContent', styles);
+      } else if (this.styleElement) {
+        this.renderer.removeChild(this.document.head, this.styleElement);
+        this.styleElement = null;
+      }
     });
 
     // Effect for layout observation
@@ -639,8 +639,8 @@ export class SpreadsheetComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     if (this.styleElement) {
-        this.renderer.removeChild(this.document.head, this.styleElement);
-        this.styleElement = null;
+      this.renderer.removeChild(this.document.head, this.styleElement);
+      this.styleElement = null;
     }
     this.resizeObserver?.disconnect();
   }
@@ -676,7 +676,7 @@ export class SpreadsheetComponent implements OnDestroy {
   }
 
   getColumnWidth = (colIndex: number) => `${this.columnConfig()()[colIndex]?.width ?? 135}px`;
-  
+
   isSelected(modelRow: number, modelCol: number): boolean {
     const visualCoords = this.modelToVisualCoords({ row: modelRow, col: modelCol });
     if (!visualCoords) return false;
@@ -691,12 +691,12 @@ export class SpreadsheetComponent implements OnDestroy {
     const visualCoords = this.modelToVisualCoords({ row: modelRow, col: modelCol });
     return !!active && !!visualCoords && active.row === visualCoords.row && active.col === visualCoords.col;
   }
-  
+
   isEditing = (r: number, c: number) => this.editingCell()?.row === r && this.editingCell()?.col === c;
   isCellInvalid = (r: number, c: number) => this.validationErrors().has(`${r}-${c}`);
 
   isFillHandleVisible(modelRow: number, modelCol: number): boolean {
-    const visualCoords = this.modelToVisualCoords({row: modelRow, col: modelCol});
+    const visualCoords = this.modelToVisualCoords({ row: modelRow, col: modelCol });
     if (!visualCoords) return false;
     const lastRange = this.selectionRanges()[this.selectionRanges().length - 1];
     if (!lastRange) return false;
@@ -705,7 +705,7 @@ export class SpreadsheetComponent implements OnDestroy {
   }
 
   isInFillRange(modelRow: number, modelCol: number): boolean {
-    const visualCoords = this.modelToVisualCoords({row: modelRow, col: modelCol});
+    const visualCoords = this.modelToVisualCoords({ row: modelRow, col: modelCol });
     if (!visualCoords) return false;
     const range = this.fillRange();
     if (!range) return false;
@@ -822,7 +822,7 @@ export class SpreadsheetComponent implements OnDestroy {
       }
     }
   }
-  
+
   onDocumentMouseMove(event: MouseEvent) {
     if (!this.spreadsheetContainer()?.nativeElement) return;
     if (!this.isMouseDown()) return;
@@ -831,7 +831,7 @@ export class SpreadsheetComponent implements OnDestroy {
       const newWidth = Math.max(60, this.resizingColStart()!.width + (event.clientX - this.resizingColStart()!.x));
       this.columnConfig().update(configs => {
         const newConfigs = [...configs];
-        if (!newConfigs[resizingCol]) newConfigs[resizingCol] = { name: '', field: ''};
+        if (!newConfigs[resizingCol]) newConfigs[resizingCol] = { name: '', field: '' };
         newConfigs[resizingCol] = { ...newConfigs[resizingCol], width: newWidth };
         return newConfigs;
       });
@@ -940,11 +940,11 @@ export class SpreadsheetComponent implements OnDestroy {
     if (!error) return;
     clearTimeout(this.tooltipTimeout);
     this.tooltipTimeout = setTimeout(() => {
-        this.tooltipText.set(error);
-        const container = this.spreadsheetContainer().nativeElement as HTMLElement;
-        const rect = container.getBoundingClientRect();
-        this.tooltipPosition.set({ x: event.clientX - rect.left + container.scrollLeft + 10, y: event.clientY - rect.top + container.scrollTop + 10 });
-        this.isTooltipVisible.set(true);
+      this.tooltipText.set(error);
+      const container = this.spreadsheetContainer().nativeElement as HTMLElement;
+      const rect = container.getBoundingClientRect();
+      this.tooltipPosition.set({ x: event.clientX - rect.left + container.scrollLeft + 10, y: event.clientY - rect.top + container.scrollTop + 10 });
+      this.isTooltipVisible.set(true);
     }, 500);
   }
 
@@ -970,16 +970,16 @@ export class SpreadsheetComponent implements OnDestroy {
   onKeyDown(event: KeyboardEvent) {
     // Handle Escape key for modals first, and then stop further processing.
     if (this.isFindReplaceVisible()) {
-        if (event.key === 'Escape') this.isFindReplaceVisible.set(false);
-        return; // Stop spreadsheet from handling keys
+      if (event.key === 'Escape') this.isFindReplaceVisible.set(false);
+      return; // Stop spreadsheet from handling keys
     }
     if (this.isColumnSettingsVisible()) {
-        if (event.key === 'Escape') this.isColumnSettingsVisible.set(false);
-        return; // Stop spreadsheet from handling keys
+      if (event.key === 'Escape') this.isColumnSettingsVisible.set(false);
+      return; // Stop spreadsheet from handling keys
     }
     if (this.isStatsModalVisible()) {
-        if (event.key === 'Escape') this.isStatsModalVisible.set(false);
-        return; // Stop spreadsheet from handling keys
+      if (event.key === 'Escape') this.isStatsModalVisible.set(false);
+      return; // Stop spreadsheet from handling keys
     }
 
     // If we are editing a cell, let the cell editor handle it
@@ -996,17 +996,17 @@ export class SpreadsheetComponent implements OnDestroy {
 
     // Find/Replace shortcut
     if ((event.ctrlKey || event.metaKey) && (event.key.toLowerCase() === 'r' || event.key.toLowerCase() === 'f')) {
-        event.preventDefault();
-        this.isFindReplaceVisible.set(true);
-        return;
+      event.preventDefault();
+      this.isFindReplaceVisible.set(true);
+      return;
     }
-    
+
     // Undo/Redo
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
-        event.preventDefault();
-        // The `cancelEdit` is no longer needed here as the `editingCell` guard handles it
-        event.shiftKey ? this.redo() : this.undo();
-        return;
+      event.preventDefault();
+      // The `cancelEdit` is no longer needed here as the `editingCell` guard handles it
+      event.shiftKey ? this.redo() : this.undo();
+      return;
     }
 
     // --- Grid Navigation and Interaction ---
@@ -1069,27 +1069,27 @@ export class SpreadsheetComponent implements OnDestroy {
     this.isNewValueEntry.set(initialValue !== undefined);
     const cellElement = this.spreadsheetContainer().nativeElement.querySelector(`td[data-row="${coords.row}"][data-col="${coords.col}"]`);
     if (cellElement) {
-        const editorBorderOffset = 1;
-        this.editorPosition.set({ top: cellElement.offsetTop - editorBorderOffset, left: cellElement.offsetLeft - editorBorderOffset, width: cellElement.offsetWidth + (editorBorderOffset * 2), height: cellElement.offsetHeight + (editorBorderOffset * 2) });
-        let valueToEdit: string | number | boolean = initialValue ?? cell?.value ?? '';
-        
-        if (colConfig?.editor === 'dropdown') {
-            const currentVal = String(cell?.value);
-            // When the dropdown opens, the search text is empty, so we work with the full options list.
-            const options = colConfig.options?.map(o => this.getOptionValue(o)) ?? [];
-            valueToEdit = options.includes(currentVal) ? currentVal : options[0] ?? '';
+      const editorBorderOffset = 1;
+      this.editorPosition.set({ top: cellElement.offsetTop - editorBorderOffset, left: cellElement.offsetLeft - editorBorderOffset, width: cellElement.offsetWidth + (editorBorderOffset * 2), height: cellElement.offsetHeight + (editorBorderOffset * 2) });
+      let valueToEdit: string | number | boolean = initialValue ?? cell?.value ?? '';
 
-            // Set the initial highlighted option to match the cell's current value.
-            const activeIndex = options.indexOf(currentVal);
-            this.dropdownActiveOptionIndex.set(activeIndex > -1 ? activeIndex : 0);
-        }
-        this.editValue.set(valueToEdit);
-        this.editingCell.set(coords);
+      if (colConfig?.editor === 'dropdown') {
+        const currentVal = String(cell?.value);
+        // When the dropdown opens, the search text is empty, so we work with the full options list.
+        const options = colConfig.options?.map(o => this.getOptionValue(o)) ?? [];
+        valueToEdit = options.includes(currentVal) ? currentVal : options[0] ?? '';
+
+        // Set the initial highlighted option to match the cell's current value.
+        const activeIndex = options.indexOf(currentVal);
+        this.dropdownActiveOptionIndex.set(activeIndex > -1 ? activeIndex : 0);
+      }
+      this.editValue.set(valueToEdit);
+      this.editingCell.set(coords);
     }
   }
-  
+
   onEditBlur = () => { if (this.editingCell()) this.saveEdit(); }
-  
+
   onEditKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' && (event.altKey || event.metaKey)) {
       event.preventDefault();
@@ -1099,7 +1099,7 @@ export class SpreadsheetComponent implements OnDestroy {
       setTimeout(() => { textarea.selectionStart = textarea.selectionEnd = selectionStart + 1; this.onEditorInput(); });
       return;
     }
-    if (event.key === 'Enter') { event.preventDefault(); this.saveEdit(); this.moveActiveCell(1, 0, false); } 
+    if (event.key === 'Enter') { event.preventDefault(); this.saveEdit(); this.moveActiveCell(1, 0, false); }
     else if (event.key === 'Escape') this.cancelEdit();
   }
 
@@ -1107,7 +1107,7 @@ export class SpreadsheetComponent implements OnDestroy {
     const el = this.editingInput()?.nativeElement;
     const initialPos = this.editorPosition();
     if (el instanceof HTMLTextAreaElement && initialPos && el.parentElement) {
-      el.style.height = 'auto'; 
+      el.style.height = 'auto';
       const requiredParentHeight = el.scrollHeight + 18;
       el.parentElement.style.height = `${Math.max(initialPos.height, requiredParentHeight)}px`;
       el.style.height = `${el.parentElement.offsetHeight - 18}px`;
@@ -1121,16 +1121,16 @@ export class SpreadsheetComponent implements OnDestroy {
     let newValue: string | number | boolean = this.editValue();
     const colConfig = this.columnConfig()()[editing.col];
     if (colConfig?.editor === 'numeric') {
-        const stringValue = String(newValue).trim();
-        if (stringValue === '') newValue = '';
-        else { const parsed = parseFloat(stringValue); if (!isNaN(parsed) && isFinite(parsed)) newValue = parsed; }
+      const stringValue = String(newValue).trim();
+      if (stringValue === '') newValue = '';
+      else { const parsed = parseFloat(stringValue); if (!isNaN(parsed) && isFinite(parsed)) newValue = parsed; }
     }
     if (originalValue !== newValue) {
       this.recordHistory();
       this.data().update(grid => {
-          const newGrid = grid.map(r => [...r]);
-          newGrid[editing.row][editing.col] = { ...newGrid[editing.row][editing.col], value: newValue };
-          return newGrid;
+        const newGrid = grid.map(r => [...r]);
+        newGrid[editing.row][editing.col] = { ...newGrid[editing.row][editing.col], value: newValue };
+        return newGrid;
       });
     }
     this.cancelEdit();
@@ -1222,14 +1222,14 @@ export class SpreadsheetComponent implements OnDestroy {
 
   handleSaveColumnSettings({ colIndex, formState }: { colIndex: number; config: ColumnConfig; formState: ColumnSettingsFormData }) {
     this.recordHistory();
-    
+
     this.columnConfig().update(configs => {
       const newConfigs = [...configs];
       const oldConfig = newConfigs[colIndex] ?? { name: '', field: '' };
-      
+
       const newOptions = formState.type === 'dropdown' ? formState.options.map(opt => ({ value: opt.value.trim(), color: opt.color })).filter(opt => opt.value) : undefined;
       const newEditor = formState.type === 'text' ? undefined : formState.type;
-      
+
       newConfigs[colIndex] = {
         ...oldConfig,
         name: formState.name,
@@ -1239,24 +1239,24 @@ export class SpreadsheetComponent implements OnDestroy {
         editor: newEditor,
         options: newOptions,
       };
-      
+
       return newConfigs;
     });
 
     this.data().update(grid => {
-        const newGrid = grid.map(r => [...r]);
-        for (let r = 0; r < newGrid.length; r++) {
-            const oldCell = newGrid[r][colIndex];
-            if (!oldCell) continue;
-            let newValue = oldCell.value;
-            if (formState.type === 'numeric') newValue = (typeof oldCell.value === 'string' && oldCell.value.trim() !== '') ? parseFloat(oldCell.value) : (typeof oldCell.value === 'boolean' ? (oldCell.value ? 1 : 0) : newValue);
-            else if (formState.type === 'checkbox') newValue = ['true', '1'].includes(String(oldCell.value).toLowerCase().trim());
-            else newValue = String(oldCell.value);
+      const newGrid = grid.map(r => [...r]);
+      for (let r = 0; r < newGrid.length; r++) {
+        const oldCell = newGrid[r][colIndex];
+        if (!oldCell) continue;
+        let newValue = oldCell.value;
+        if (formState.type === 'numeric') newValue = (typeof oldCell.value === 'string' && oldCell.value.trim() !== '') ? parseFloat(oldCell.value) : (typeof oldCell.value === 'boolean' ? (oldCell.value ? 1 : 0) : newValue);
+        else if (formState.type === 'checkbox') newValue = ['true', '1'].includes(String(oldCell.value).toLowerCase().trim());
+        else newValue = String(oldCell.value);
 
-            const newCell: Cell = { ...oldCell, value: newValue };
-            newGrid[r][colIndex] = newCell;
-        }
-        return newGrid;
+        const newCell: Cell = { ...oldCell, value: newValue };
+        newGrid[r][colIndex] = newCell;
+      }
+      return newGrid;
     });
     this.isColumnSettingsVisible.set(false);
   }
@@ -1264,7 +1264,7 @@ export class SpreadsheetComponent implements OnDestroy {
   // --- Context Menu Logic ---
   onDocumentMouseDown(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    
+
     // If a dropdown editor is open, its own mousedown handler stops propagation.
     // Therefore, if this document-level listener fires, the click must have been outside the dropdown.
     const editing = this.editingCell();
@@ -1274,7 +1274,7 @@ export class SpreadsheetComponent implements OnDestroy {
 
     // Ignore clicks on filter toggles; their own (click) handler will manage state.
     if (target.closest('.filter-toggle-btn')) {
-        return;
+      return;
     }
 
     // For any other mousedown that reaches the document, close transient UI elements.
@@ -1285,8 +1285,8 @@ export class SpreadsheetComponent implements OnDestroy {
     // If the click was completely outside the component, clear the selection.
     const rootEl = this.rootContainer()?.nativeElement;
     if (rootEl && !rootEl.contains(target)) {
-        this.activeCell.set(null);
-        this.selectionRanges.set([]);
+      this.activeCell.set(null);
+      this.selectionRanges.set([]);
     }
   }
 
@@ -1306,9 +1306,9 @@ export class SpreadsheetComponent implements OnDestroy {
     event.preventDefault(); this.closeContextMenu();
     const modelRow = this.displayedRows()[visualRowIndex].originalModelIndex;
     if (!this.isSelected(modelRow, 0)) {
-        const start = { row: visualRowIndex, col: 0 };
-        this.activeCell.set(start);
-        this.selectionRanges.set([{ start, end: { row: visualRowIndex, col: this.colsCount() - 1 } }]);
+      const start = { row: visualRowIndex, col: 0 };
+      this.activeCell.set(start);
+      this.selectionRanges.set([{ start, end: { row: visualRowIndex, col: this.colsCount() - 1 } }]);
     }
     this.contextMenuType.set('row');
     this.contextMenuCoords.set({ row: modelRow, col: 0 });
@@ -1387,15 +1387,15 @@ export class SpreadsheetComponent implements OnDestroy {
   }
 
   deleteColumn() {
-      const selection = this.activeSelectionRange();
-      if (!selection) return;
-      this.recordHistory();
-      const { start, end } = this.normalizeRange(selection);
-      const count = end.col - start.col + 1;
-      this.data().update(grid => grid.map(row => { row.splice(start.col, count); return row; }));
-      this.columnConfig().update(c => { c.splice(start.col, count); return c; });
-      this.activeCell.set(null);
-      this.selectionRanges.set([]);
+    const selection = this.activeSelectionRange();
+    if (!selection) return;
+    this.recordHistory();
+    const { start, end } = this.normalizeRange(selection);
+    const count = end.col - start.col + 1;
+    this.data().update(grid => grid.map(row => { row.splice(start.col, count); return row; }));
+    this.columnConfig().update(c => { c.splice(start.col, count); return c; });
+    this.activeCell.set(null);
+    this.selectionRanges.set([]);
   }
 
   copyTableData() {
@@ -1479,7 +1479,7 @@ export class SpreadsheetComponent implements OnDestroy {
     const oldToNew = new Array(N);
     newToOld.forEach((oldIdx, newIdx) => oldToNew[oldIdx] = newIdx);
     this.data().update(grid => grid.map(row => newToOld.map(oldIdx => row[oldIdx])));
-    this.columnConfig().update(c => newToOld.map(oldIdx => c[oldIdx] || {name:'', field:''}));
+    this.columnConfig().update(c => newToOld.map(oldIdx => c[oldIdx] || { name: '', field: '' }));
     this.sortConfig.update(s => s ? { ...s, col: oldToNew[s.col] } : null);
     this.filterConfig.update(f => { const nf = new Map(); for (const [oc, v] of f.entries()) nf.set(oldToNew[oc], v); return nf; });
     const update = (c: Coordinates) => ({ ...c, col: oldToNew[c.col] });
@@ -1517,22 +1517,22 @@ export class SpreadsheetComponent implements OnDestroy {
   private visualToModelCoords = (c: Coordinates) => c.row < 0 || c.row >= this.displayedRows().length ? null : { row: this.displayedRows()[c.row].originalModelIndex, col: c.col };
   private modelToVisualCoords = (c: Coordinates) => { const vr = this.displayedRows().findIndex(i => i.originalModelIndex === c.row); return vr === -1 ? null : { row: vr, col: c.col }; };
   private toggleCheckbox(r: number, c: number) { const cell = this.getCell(r, c); const colConfig = this.columnConfig()()[c]; if (!cell || colConfig?.editor !== 'checkbox' || cell.readOnly) return; this.recordHistory(); this.data().update(g => { const ng = g.map(row => [...row]); ng[r][c] = { ...ng[r][c], value: !ng[r][c].value }; return ng; }); }
-  
+
   private validateData(grid: Cell[][]) {
     const errors = new Map<string, string>();
     grid.forEach((row, r) => {
       row.forEach((cell, c) => {
-          const colConfig = this.columnConfig()()[c];
-          if (colConfig?.editor === 'dropdown' && colConfig.options?.length && !colConfig.options.map(o => this.getOptionValue(o)).includes(String(cell.value))) {
-              errors.set(`${r}-${c}`, `Invalid value. Please choose from the available options.`);
-          } else if (colConfig?.editor === 'numeric' && cell.value != '' && cell.value != null && (typeof cell.value !== 'number' || !isFinite(cell.value))) {
-              errors.set(`${r}-${c}`, `Value must be a number.`);
-          }
+        const colConfig = this.columnConfig()()[c];
+        if (colConfig?.editor === 'dropdown' && colConfig.options?.length && !colConfig.options.map(o => this.getOptionValue(o)).includes(String(cell.value))) {
+          errors.set(`${r}-${c}`, `Invalid value. Please choose from the available options.`);
+        } else if (colConfig?.editor === 'numeric' && cell.value != '' && cell.value != null && (typeof cell.value !== 'number' || !isFinite(cell.value))) {
+          errors.set(`${r}-${c}`, `Value must be a number.`);
+        }
       });
     });
     this.validationErrors.set(errors);
   }
-  
+
   private _convertDataToTSV = (data: Cell[][]) => data.map(row => row.map(cell => { const v = String(cell?.value ?? ''); return v.match(/["\n\t]/) ? `"${v.replace(/"/g, '""')}"` : v; }).join('\t')).join('\n');
   private _convertDataToCSV = (data: Cell[][]) => data.map(row => row.map(cell => { const v = String(cell?.value ?? ''); return v.match(/["\n\r,]/) ? `"${v.replace(/"/g, '""')}"` : v; }).join(',')).join('\n');
 
@@ -1542,22 +1542,22 @@ export class SpreadsheetComponent implements OnDestroy {
     const selectedData = this.displayedRows().slice(norm.start.row, norm.end.row + 1).map(item => item.cells.slice(norm.start.col, norm.end.col + 1));
     await navigator.clipboard.writeText(this._convertDataToTSV(selectedData));
   }
-  
+
   private _convertPastedValue(value: string, colConfig: ColumnConfig | undefined): string | number | boolean {
     if (!colConfig) return value;
 
     switch (colConfig.editor) {
-        case 'numeric':
-            const trimmedValue = value.trim();
-            if (trimmedValue === '') return ''; // Allow clearing cell
-            const cleanedValue = trimmedValue.replace(/[\$,]/g, '');
-            const parsed = parseFloat(cleanedValue);
-            return !isNaN(parsed) && isFinite(parsed) ? parsed : value; // Return original string if not a valid number
-        case 'checkbox':
-            const lowerValue = value.toLowerCase().trim();
-            return lowerValue === 'true' || lowerValue === '1';
-        default:
-            return value;
+      case 'numeric':
+        const trimmedValue = value.trim();
+        if (trimmedValue === '') return ''; // Allow clearing cell
+        const cleanedValue = trimmedValue.replace(/[\$,]/g, '');
+        const parsed = parseFloat(cleanedValue);
+        return !isNaN(parsed) && isFinite(parsed) ? parsed : value; // Return original string if not a valid number
+      case 'checkbox':
+        const lowerValue = value.toLowerCase().trim();
+        return lowerValue === 'true' || lowerValue === '1';
+      default:
+        return value;
     }
   }
 
@@ -1573,7 +1573,7 @@ export class SpreadsheetComponent implements OnDestroy {
           const norm = this.normalizeRange(range);
           for (let r = norm.start.row; r <= norm.end.row; r++) {
             for (let c = norm.start.col; c <= norm.end.col; c++) {
-              const model = this.visualToModelCoords({row: r, col: c});
+              const model = this.visualToModelCoords({ row: r, col: c });
               if (!model) continue;
               const colConfig = this.columnConfig()()[model.col];
               const target = newGrid[model.row]?.[model.col];
@@ -1597,7 +1597,7 @@ export class SpreadsheetComponent implements OnDestroy {
         for (let rOff = 0; rOff < effRows; rOff++) {
           for (let cOff = 0; cOff < effCols; cOff++) {
             const targetVisualCoords = { row: startVisual.row + rOff, col: startVisual.col + cOff };
-            
+
             if (targetVisualCoords.col >= this.colsCount()) continue;
 
             const modelCoords = this.visualToModelCoords(targetVisualCoords);
@@ -1605,9 +1605,9 @@ export class SpreadsheetComponent implements OnDestroy {
 
             const target = newGrid[modelCoords.row]?.[modelCoords.col];
             if (target && !target.readOnly) {
-                const value = pastedRows[rOff % pastedRows.length][cOff % pastedRows[0].length];
-                const colConfig = this.columnConfig()()[modelCoords.col];
-                newGrid[modelCoords.row][modelCoords.col] = { ...target, value: this._convertPastedValue(value, colConfig) };
+              const value = pastedRows[rOff % pastedRows.length][cOff % pastedRows[0].length];
+              const colConfig = this.columnConfig()()[modelCoords.col];
+              newGrid[modelCoords.row][modelCoords.col] = { ...target, value: this._convertPastedValue(value, colConfig) };
             }
           }
         }
@@ -1619,31 +1619,31 @@ export class SpreadsheetComponent implements OnDestroy {
   private _parseTSV(tsv: string): string[][] { /* Complex parser, simplified for brevity */ return tsv.split('\n').map(r => r.split('\t')); }
   private _parseCSV(csv: string): string[][] { /* Complex parser, simplified for brevity */ return csv.split('\n').map(r => r.split(',')); }
   private getCoordsFromTarget = (t: HTMLElement): Coordinates | null => { const c = t.closest('td[data-row][data-col]'); return c ? { row: parseInt(c.getAttribute('data-row')!), col: parseInt(c.getAttribute('data-col')!) } : null; }
-  private normalizeRange = (r: {start: Coordinates, end: Coordinates}) => ({ start: { row: Math.min(r.start.row, r.end.row), col: Math.min(r.start.col, r.end.col) }, end: { row: Math.max(r.start.row, r.end.row), col: Math.max(r.start.col, r.end.col) } });
-  
+  private normalizeRange = (r: { start: Coordinates, end: Coordinates }) => ({ start: { row: Math.min(r.start.row, r.end.row), col: Math.min(r.start.col, r.end.col) }, end: { row: Math.max(r.start.row, r.end.row), col: Math.max(r.start.col, r.end.col) } });
+
   private moveActiveCell(rd: number, cd: number, extend: boolean) {
     const a = this.activeCell();
     if (!a) return;
     const nc = {
-        row: Math.max(0, Math.min(this.displayedRows().length - 1, a.row + rd)),
-        col: Math.max(0, Math.min(this.colsCount() - 1, a.col + cd))
+      row: Math.max(0, Math.min(this.displayedRows().length - 1, a.row + rd)),
+      col: Math.max(0, Math.min(this.colsCount() - 1, a.col + cd))
     };
     this.activeCell.set(nc);
     if (extend && this.selectionRanges().length > 0) {
-        this.selectionRanges.update(r => [...r.slice(0, -1), { start: r[r.length - 1]!.start, end: nc }]);
+      this.selectionRanges.update(r => [...r.slice(0, -1), { start: r[r.length - 1]!.start, end: nc }]);
     } else {
-        this.selectionRanges.set([{ start: nc, end: nc }]);
+      this.selectionRanges.set([{ start: nc, end: nc }]);
     }
     const mc = this.visualToModelCoords(nc);
     if (mc) {
-        this.scrollCellIntoView(mc, nc);
+      this.scrollCellIntoView(mc, nc);
     }
   }
 
   private scrollCellIntoView(modelCoords: Coordinates, visualCoords: Coordinates) {
     const container = this.spreadsheetContainer()?.nativeElement as HTMLElement;
     if (!container) return;
-    
+
     // Query for the table cell and the sticky headers
     const cellEl = container.querySelector(`[data-row="${modelCoords.row}"][data-col="${modelCoords.col}"]`) as HTMLElement;
     const headerEl = container.querySelector('thead') as HTMLElement;
@@ -1671,36 +1671,36 @@ export class SpreadsheetComponent implements OnDestroy {
     // --- Vertical Scroll Adjustment ---
     // Check if the cell is obscured by the sticky header or is above the current viewport
     if (cellTop < containerScrollTop + headerHeight) {
-        container.scrollTop = cellTop - headerHeight;
-    } 
+      container.scrollTop = cellTop - headerHeight;
+    }
     // Check if the cell is below the current viewport
     else if (cellBottom > containerScrollTop + containerVisibleHeight) {
-        container.scrollTop = cellBottom - containerVisibleHeight;
+      container.scrollTop = cellBottom - containerVisibleHeight;
     }
 
     // --- Horizontal Scroll Adjustment ---
     // Check if the cell is obscured by the sticky column or is to the left of the current viewport
     if (cellLeft < containerScrollLeft + rowHeaderWidth) {
-        container.scrollLeft = cellLeft - rowHeaderWidth;
-    } 
+      container.scrollLeft = cellLeft - rowHeaderWidth;
+    }
     // Check if the cell is to the right of the current viewport
     else if (cellRight > containerScrollLeft + containerVisibleWidth) {
-        container.scrollLeft = cellRight - containerVisibleWidth;
+      container.scrollLeft = cellRight - containerVisibleWidth;
     }
-    
+
     // --- Edge Case Snapping ---
     // When navigating to the very first column or row, ensure scrollbars are reset to the origin.
     // This provides a better user experience by fully revealing the headers.
     if (visualCoords.col === 0) {
-        container.scrollLeft = 0;
+      container.scrollLeft = 0;
     }
     if (visualCoords.row === 0) {
-        container.scrollTop = 0;
+      container.scrollTop = 0;
     }
   }
 
-  private clearSelectedCells() { if (this.selectionRanges().length === 0) return; this.recordHistory(); this.data().update(grid => { const newGrid = grid.map(r => [...r]); this.selectionRanges().forEach(range => { const norm = this.normalizeRange(range); for (let r = norm.start.row; r <= norm.end.row; r++) for (let c = norm.start.col; c <= norm.end.col; c++) { const model = this.visualToModelCoords({row: r, col: c}); const colConfig = this.columnConfig()()[c]; if (model && newGrid[model.row][model.col] && !newGrid[model.row][model.col].readOnly) newGrid[model.row][model.col] = {...newGrid[model.row][model.col], value: colConfig?.editor === 'checkbox' ? false : ''}; }}); return newGrid; }); }
-  private applyFill(fill: { start: Coordinates; end: Coordinates } | null) { const sel = this.activeSelectionRange(); if (!fill || !sel) return; this.recordHistory(); const normSel = this.normalizeRange(sel), normFill = this.normalizeRange(fill); this.data().update(grid => { const newGrid = grid.map(r => [...r]); const sRows = normSel.end.row - normSel.start.row + 1, sCols = normSel.end.col - normSel.start.col + 1; for (let r = normSel.start.row; r <= normFill.end.row; r++) for (let c = normSel.start.col; c <= normFill.end.col; c++) if (r > normSel.end.row || c > normSel.end.col) { const sVisRow = normSel.start.row + ((r - normSel.start.row) % sRows), sVisCol = normSel.start.col + ((c - normSel.start.col) % sCols); const sMod = this.visualToModelCoords({row: sVisRow, col: sVisCol}), tMod = this.visualToModelCoords({row: r, col: c}); if (sMod && tMod && newGrid[tMod.row]?.[c] && !newGrid[tMod.row][c].readOnly) newGrid[tMod.row][c] = { ...newGrid[tMod.row][c], value: grid[sMod.row][sMod.col].value }; } return newGrid; }); this.selectionRanges.set([fill]); }
+  private clearSelectedCells() { if (this.selectionRanges().length === 0) return; this.recordHistory(); this.data().update(grid => { const newGrid = grid.map(r => [...r]); this.selectionRanges().forEach(range => { const norm = this.normalizeRange(range); for (let r = norm.start.row; r <= norm.end.row; r++) for (let c = norm.start.col; c <= norm.end.col; c++) { const model = this.visualToModelCoords({ row: r, col: c }); const colConfig = this.columnConfig()()[c]; if (model && newGrid[model.row][model.col] && !newGrid[model.row][model.col].readOnly) newGrid[model.row][model.col] = { ...newGrid[model.row][model.col], value: colConfig?.editor === 'checkbox' ? false : '' }; } }); return newGrid; }); }
+  private applyFill(fill: { start: Coordinates; end: Coordinates } | null) { const sel = this.activeSelectionRange(); if (!fill || !sel) return; this.recordHistory(); const normSel = this.normalizeRange(sel), normFill = this.normalizeRange(fill); this.data().update(grid => { const newGrid = grid.map(r => [...r]); const sRows = normSel.end.row - normSel.start.row + 1, sCols = normSel.end.col - normSel.start.col + 1; for (let r = normSel.start.row; r <= normFill.end.row; r++) for (let c = normSel.start.col; c <= normFill.end.col; c++) if (r > normSel.end.row || c > normSel.end.col) { const sVisRow = normSel.start.row + ((r - normSel.start.row) % sRows), sVisCol = normSel.start.col + ((c - normSel.start.col) % sCols); const sMod = this.visualToModelCoords({ row: sVisRow, col: sVisCol }), tMod = this.visualToModelCoords({ row: r, col: c }); if (sMod && tMod && newGrid[tMod.row]?.[c] && !newGrid[tMod.row][c].readOnly) newGrid[tMod.row][c] = { ...newGrid[tMod.row][c], value: grid[sMod.row][sMod.col].value }; } return newGrid; }); this.selectionRanges.set([fill]); }
   private _performIntelligentReplace(pastedGrid: string[][]) { /* ... complex logic ... */ }
   private _inferColumnType = (data: string[][], col: number): any => 'text';
   private _toKebabCase = (str: string) => String(str).replace(/([a-z\d])([A-Z])/g, '$1-$2').replace(/[\s_]+/g, '-').toLowerCase();

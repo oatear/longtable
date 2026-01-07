@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Cell, ColumnConfig, AnalysisOption, AnalysisType, GraphConfig, DistributionGraphConfig, CorrelationGraphConfig } from '../../models/spreadsheet.model';
+import { Cell, ColumnConfig, AnalysisOption, AnalysisType, GraphConfig, DistributionGraphConfig, CorrelationGraphConfig, SpreadsheetTheme } from '../../models/spreadsheet.model';
 import { DistributionAnalysisComponent } from '../distribution-analysis/distribution-analysis.component';
 import { CorrelationAnalysisComponent } from '../correlation-analysis/correlation-analysis.component';
 
@@ -17,6 +17,7 @@ export class TableStatsComponent {
   columnConfig = input.required<ColumnConfig[]>();
   graphs = input.required<GraphConfig[]>();
   useCountColumn = input.required<WritableSignal<boolean>>();
+  theme = input.required<SpreadsheetTheme>();
 
   close = output<void>();
 
@@ -43,9 +44,9 @@ export class TableStatsComponent {
     const catOptions = this.categoricalOptions();
     const allOptions = this.analysisOptions();
     const usedFields = new Set<number>();
-    
+
     const distributionGraphCount = this.graphs().filter(g => g.type === 'distribution').length;
-    
+
     const result: (number | null)[] = [];
     for (let i = 0; i < distributionGraphCount; i++) {
       // Try to find an unused categorical option first
@@ -73,7 +74,7 @@ export class TableStatsComponent {
   getDistributionIndex(graphIndex: number): number {
     let distIndex = -1;
     for (let i = 0; i <= graphIndex; i++) {
-      if(this.graphs()[i].type === 'distribution') {
+      if (this.graphs()[i].type === 'distribution') {
         distIndex++;
       }
     }

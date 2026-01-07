@@ -30,28 +30,28 @@ export interface ColumnConfig {
 }
 
 export interface ContextMenuData {
-    insertRowsAboveText: string;
-    insertRowsBelowText: string;
-    deleteRowText: string;
-    deleteColText: string;
-    isInsertColumnActionReadOnly: boolean;
-    isDeleteColumnActionReadOnly: boolean;
-    canDeleteRows: boolean;
-    canDeleteCols: boolean;
+  insertRowsAboveText: string;
+  insertRowsBelowText: string;
+  deleteRowText: string;
+  deleteColText: string;
+  isInsertColumnActionReadOnly: boolean;
+  isDeleteColumnActionReadOnly: boolean;
+  canDeleteRows: boolean;
+  canDeleteCols: boolean;
 }
 
 export interface ColumnSettingsFormData {
-    name: string;
-    description: string;
-    type: ColumnType;
-    options: { value: string; color: string }[];
-    widthValue: number | null;
+  name: string;
+  description: string;
+  type: ColumnType;
+  options: { value: string; color: string }[];
+  widthValue: number | null;
 }
 
 export interface AnalysisOption {
-    label: string;
-    value: number;
-    type: AnalysisType;
+  label: string;
+  value: number;
+  type: AnalysisType;
 }
 
 export interface SavedDistributionAnalysisState {
@@ -89,13 +89,13 @@ export interface SpreadsheetTheme {
     bgSelection: string;
     inputBg: string;
     bgInvalid: string;
-    
+
     // Text
     textPrimary: string;
     textHeader: string;
     textReadOnly: string;
     textSelection?: string;
-    
+
     // Borders
     borderDefault: string;
     borderGrid: string;
@@ -106,7 +106,7 @@ export interface SpreadsheetTheme {
     fillHandleBorder: string;
     dropIndicator: string;
     selectionShadow: string;
-    
+
     // Icons & Popups
     iconDefault: string;
     iconHoverBg: string;
@@ -127,6 +127,10 @@ export interface SpreadsheetTheme {
     // Checkboxes
     checkboxBg: string;
     checkboxBorder: string;
+
+    // Graphs
+    graphPrimary: string;
+    graphSecondary: string;
   };
   scrollbar?: {
     track: string;

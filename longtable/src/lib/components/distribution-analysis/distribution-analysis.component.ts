@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, effect, viewChild, ElementRef, ChangeDetectorRef, inject, WritableSignal, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Cell, AnalysisType, AnalysisOption, DropdownOption, SavedDistributionAnalysisState, ColumnConfig } from '../../models/spreadsheet.model';
+import { Cell, AnalysisType, AnalysisOption, DropdownOption, SavedDistributionAnalysisState, ColumnConfig, SpreadsheetTheme } from '../../models/spreadsheet.model';
 import {
   select,
   max,
@@ -38,6 +38,7 @@ export class DistributionAnalysisComponent {
   initialAnalysisField = input<number | null>(null);
   state = input.required<WritableSignal<SavedDistributionAnalysisState>>();
   columnConfig = input.required<ColumnConfig[]>();
+  theme = input.required<SpreadsheetTheme>();
 
   private chartContainer = viewChild<ElementRef<HTMLDivElement>>('distributionChartContainer');
   private tooltip = viewChild<ElementRef<HTMLDivElement>>('statsTooltip');
@@ -299,7 +300,7 @@ export class DistributionAnalysisComponent {
     if (data.length === 0) return;
 
     const isDark = document.documentElement.classList.contains('dark');
-    const textColor = isDark ? '#94a3b8' : '#64748b'; // More visible
+    const textColor = this.theme().colors.graphSecondary;
     const barStep = 25;
     const margin = { top: 5, right: 20, bottom: 60, left: 120 };
     const height = data.length * barStep;
@@ -359,7 +360,7 @@ export class DistributionAnalysisComponent {
 
     svg.selectAll('.bar').data(data).enter().append('rect')
       .attr('class', 'bar').attr('x', x(0)).attr('y', d => y(d.key)!)
-      .attr('width', d => x(d.value) - x(0)).attr('height', y.bandwidth()).attr('fill', '#3b82f6')
+      .attr('width', d => x(d.value) - x(0)).attr('height', y.bandwidth()).attr('fill', this.theme().colors.graphPrimary)
       .on('mouseover', (event, d) => {
         select(event.currentTarget).style('opacity', '0.85');
         tooltip.style('opacity', '1').html(`<strong>${d.key}</strong><br/>Count: ${d.value}`);
@@ -393,7 +394,7 @@ export class DistributionAnalysisComponent {
     const series = stack().keys(stackKeys)(data as any);
 
     const isDark = document.documentElement.classList.contains('dark');
-    const textColor = isDark ? '#94a3b8' : '#64748b'; // More visible
+    const textColor = this.theme().colors.graphSecondary;
     const barStep = 30;
     const margin = { top: 5, right: 120, bottom: 60, left: 120 };
     const height = data.length * barStep;
@@ -502,8 +503,7 @@ export class DistributionAnalysisComponent {
   }
 
   private _renderGradientLegend(svg: Selection<SVGGElement, unknown, null, undefined>, colorScale: ScaleSequentialType<string>, legendX: number, legendY: number, height: number, title: string) {
-    const isDark = document.documentElement.classList.contains('dark');
-    const textColor = isDark ? '#94a3b8' : '#64748b';
+    const textColor = this.theme().colors.graphSecondary;
     const [min, max] = colorScale.domain();
     if (min === undefined || max === undefined) return;
     const legendId = `legend-gradient-${Math.random().toString(36).substring(2, 9)}`;

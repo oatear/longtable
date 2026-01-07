@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, signal, inject, Renderer2, computed
 import { DOCUMENT } from '@angular/common';
 import { SpreadsheetComponent } from '@longtable/angular-spreadsheet';
 import { Cell, ColumnConfig, DropdownOption, SpreadsheetTheme } from '@longtable/angular-spreadsheet';
-import { longLight, longDark, cosmicDark } from '@longtable/angular-spreadsheet';
+import { longLight, longDark, cosmicDark, goldDust } from '@longtable/angular-spreadsheet';
 import { SafeHtmlPipe } from './safe-html.pipe';
 
 declare var marked: { parse: (markdown: string) => string };
@@ -53,14 +53,15 @@ export class AppComponent implements OnInit {
     ]
   );
 
-  selectedSpreadsheetThemeName = signal<'light' | 'dark' | 'cosmic-dark'>('dark');
+  selectedSpreadsheetThemeName = signal<'light' | 'dark' | 'cosmic-dark' | 'gold-dust'>('dark');
 
-  spreadsheetTheme = computed<SpreadsheetTheme | null>(() => {
+  spreadsheetTheme = computed<SpreadsheetTheme>(() => {
     switch (this.selectedSpreadsheetThemeName()) {
       case 'light': return longLight;
       case 'dark': return longDark;
       case 'cosmic-dark': return cosmicDark;
-      default: return null;
+      case 'gold-dust': return goldDust;
+      default: return longDark;
     }
   });
 
@@ -74,7 +75,7 @@ export class AppComponent implements OnInit {
 
     effect(() => {
       const themeName = this.selectedSpreadsheetThemeName();
-      if (themeName === 'dark' || themeName === 'cosmic-dark') {
+      if (themeName === 'dark' || themeName === 'cosmic-dark' || themeName === 'gold-dust') {
         this.renderer.addClass(this.document.documentElement, 'dark');
       } else {
         this.renderer.removeClass(this.document.documentElement, 'dark');
@@ -111,7 +112,7 @@ export class AppComponent implements OnInit {
   }
 
   onThemeChange(event: Event) {
-    const value = (event.target as HTMLSelectElement).value as 'light' | 'dark' | 'cosmic-dark';
+    const value = (event.target as HTMLSelectElement).value as 'light' | 'dark' | 'cosmic-dark' | 'gold-dust';
     this.selectedSpreadsheetThemeName.set(value);
   }
 

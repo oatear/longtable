@@ -29,13 +29,13 @@ export const longLight: SpreadsheetTheme = {
     bgSelection: '#dbeafe', // blue-100
     inputBg: '#f7f8f9',
     bgInvalid: '#fee2e2', // red-100
-    
+
     // Text
     textPrimary: '#0f172a',
     textHeader: '#475569',
     textReadOnly: '#64748b',
     textSelection: '#1e40af', // blue-800
-    
+
     // Borders
     borderDefault: '#e2e8f0',
     borderGrid: '#e2e8f0',
@@ -46,7 +46,7 @@ export const longLight: SpreadsheetTheme = {
     fillHandleBorder: '#ffffff',
     dropIndicator: '#3b82f6',
     selectionShadow: '#2563eb',
-    
+
     // Icons & Popups
     iconDefault: '#94a3b8',
     iconHoverBg: '#cbd5e1',
@@ -67,6 +67,10 @@ export const longLight: SpreadsheetTheme = {
     // Checkboxes
     checkboxBg: '#ffffff',
     checkboxBorder: '#cbd5e1', // slate-300
+
+    // Graphs
+    graphPrimary: '#3b82f6', // blue-500
+    graphSecondary: '#64748b', // slate-500
   },
   scrollbar: {
     track: '#f1f5f9',
@@ -128,6 +132,10 @@ export const longDark: SpreadsheetTheme = {
     // Checkboxes
     checkboxBg: '#353d48',
     checkboxBorder: '#424d5d',
+
+    // Graphs
+    graphPrimary: '#3b82f6', // blue-500
+    graphSecondary: '#94a3b8', // slate-400
   },
   scrollbar: {
     track: '#353d48',
@@ -150,7 +158,7 @@ export const cosmicDark: SpreadsheetTheme = {
     bgHeader: '#2c2a38',
     bgHeaderHover: '#383645',
     popupBg: 'radial-gradient(circle at 15% 75%, rgb(199 63 187 / 15%) 0%, rgba(34, 211, 238, 0) 25%), radial-gradient(circle at 80% 20%, rgba(167, 139, 250, 0.1) 0%, rgba(167, 139, 250, 0) 20%), linear-gradient(160deg, #2a2836 0%, #2e2c3b 100%)',
-    
+
     // Selection colors using purple accent
     bgSelection: 'rgba(139, 92, 246, 0.4)', // violet-500/40
     textSelection: '#ede9fe', // violet-100
@@ -188,6 +196,10 @@ export const cosmicDark: SpreadsheetTheme = {
     // Themed checkboxes
     checkboxBorder: '#413e4f',
     checkboxBg: '#2c2a38',
+
+    // Graphs
+    graphPrimary: '#a78bfa', // violet-400
+    graphSecondary: '#7a768d',
   },
   fontFamily,
   scrollbar: {
@@ -196,5 +208,65 @@ export const cosmicDark: SpreadsheetTheme = {
     thumbHover: '#66617a',
     border: '#2c2a38',
     corner: '#2c2a38',
+  },
+};
+
+export const goldDust: SpreadsheetTheme = {
+  ...longDark,
+  name: 'gold-dust',
+  colors: {
+    ...longDark.colors,
+    // Backgrounds - Deep Obsidian with a very subtle golden "aurora" effect
+    bgPrimary: 'radial-gradient(circle at 50% -20%, rgba(212, 175, 55, 0.12) 0%, rgb(108 98 66 / 0%) 50%), radial-gradient(circle at 10% 20%, rgba(184, 134, 11, 0.04) 0%, rgba(13, 13, 13, 0) 40%), linear-gradient(180deg, #363326 0%, #33312c 100%)',
+    bgHeader: '#38362aff',
+    bgHeaderHover: '#454236ff',
+    inputBg: '#22211d',
+    popupBg: 'linear-gradient(160deg, #363326 0%, #33312c 100%)',
+
+    // Selection colors - Sophisticated champagne wash
+    bgSelection: 'rgba(197, 160, 89, 0.18)',
+    textSelection: '#ffffff',
+
+    // Interactive elements - High-quality metallic accents
+    borderEditing: '#b79e47ff', // Bright Gold for focus
+    selectionShadow: 'rgba(197, 160, 89, 0.3)',
+    iconActive: '#c5a059', // Champagne Gold
+    fillHandle: '#b79e47ff',
+    dropIndicator: '#b79e47ff',
+
+    // Buttons - Elegant Dark Gold
+    buttonPrimaryBg: 'linear-gradient(180deg, #b8860b 0%, #8b6508 100%)',
+    buttonPrimaryBgHover: 'linear-gradient(180deg, #996515 0%, #724c10 100%)',
+    buttonPrimaryText: '#ffffff',
+
+    // Themed text colors - Off-white with golden headers
+    textPrimary: '#dbd4c1ff',
+    textHeader: '#c5a059', // Champagne Gold
+    textReadOnly: '#4a4a4a',
+
+    // Themed borders - Noble dark bronze/charcoal
+    borderDefault: '#2a2a2a',
+    borderGrid: '#2a2a2a',
+    popupBorder: '#2a2a2a',
+
+    // Icons
+    iconDefault: '#c5a059',
+    iconHoverBg: '#2a2a2a',
+    iconHoverText: '#c5a059',
+
+    // Checkboxes
+    checkboxBorder: '#3d3d35',
+    checkboxBg: '#0d0d0d',
+
+    // Graphs
+    graphPrimary: '#d4af37', // Gold
+    graphSecondary: '#c5a059', // Champagne
+  },
+  scrollbar: {
+    track: '#38362aff',
+    thumb: '#2a2a2a',
+    thumbHover: '#1f1f1fff',
+    border: '#38362aff',
+    corner: '#38362aff',
   },
 };
