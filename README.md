@@ -1,4 +1,5 @@
 <div align="center">
+<img src="docs/src/assets/longtable-logo.png" width="128" alt="Oatear Longtable Logo">
 
 # Oatear Longtable
 
