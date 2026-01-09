@@ -18,27 +18,27 @@
     "build:lib": "ng-packagr -p longtable/ng-package.json -c longtable/tsconfig.lib.json"
   },
   "dependencies": {
-    "@angular/common": "^20.3.0",
-    "@angular/core": "^20.3.0",
-    "@angular/forms": "^20.3.9",
-    "@angular/platform-browser": "^20.3.0",
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
     "d3": "^7.9.0",
     "marked": "^12.0.2",
     "primeicons": "^7.0.0",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
-    "@analogjs/vite-plugin-angular": "^2.2.0",
-    "@angular/build": "^20.3.0",
-    "@angular/cli": "^20.3.0",
-    "@angular/compiler": "^20.3.9",
-    "@angular/compiler-cli": "^20.3.9",
+    "@analogjs/vite-plugin-angular": "^2.2.1",
+    "@angular/build": "^21.0.0",
+    "@angular/cli": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
     "@types/d3": "^7.4.3",
     "@types/marked": "^6.0.0",
     "@types/node": "^25.0.3",
-    "ng-packagr": "^20.1.0",
+    "ng-packagr": "^21.0.0",
     "tailwindcss": "^3.4.4",
-    "typescript": "~5.8.0",
+    "typescript": "~5.9.0",
     "vite": "^7.1.11"
   }
 }

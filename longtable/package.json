@@ -1,6 +1,6 @@
 {
   "name": "oatear-longtable",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A feature-rich spreadsheet component built for Angular.",
   "repository": "https://github.com/oatear/longtable",
   "author": {
@@ -9,9 +9,9 @@
     "url": "https://oatear.com"
   },
   "peerDependencies": {
-    "@angular/common": "^20.3.9",
-    "@angular/core": "^20.3.9",
-    "@angular/forms": "^20.3.9",
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
     "d3": "^7.9.0",
     "rxjs": "^7.8.1"
   }
