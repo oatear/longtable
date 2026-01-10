@@ -1,0 +1,93 @@
+@import 'primeicons/primeicons.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* GitHub-like markdown styling */
+.markdown-body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 16px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  @apply text-[#24292f] dark:text-[#c9d1d9];
+}
+
+.markdown-body h1,
+.markdown-body h2 {
+  @apply border-b border-[#d0d7de] dark:border-[#30363d] pb-[0.3em] mt-6 mb-4 font-semibold;
+}
+
+.markdown-body h1 {
+  @apply text-2xl;
+}
+
+.markdown-body h2 {
+  @apply text-xl;
+}
+
+.markdown-body h3 {
+  @apply text-lg font-semibold mt-6 mb-4;
+}
+
+.markdown-body h4 {
+  @apply text-base font-semibold mt-6 mb-4;
+}
+
+.markdown-body p {
+  @apply mt-0 mb-4;
+}
+
+.markdown-body a {
+  @apply text-[#0969da] dark:text-[#58a6ff] no-underline hover:underline;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  @apply pl-8 mb-4;
+}
+
+.markdown-body li {
+  @apply mb-1;
+}
+
+.markdown-body blockquote {
+  @apply ml-0 px-4 text-[#57606a] dark:text-[#8b949e] border-l-4 border-[#d0d7de] dark:border-[#30363d] mb-4;
+}
+
+.markdown-body pre {
+  @apply p-4 overflow-auto text-[85%] leading-[1.45] bg-[#f6f8fa] dark:bg-[#353d48] rounded-md mb-4;
+}
+
+.markdown-body code {
+  @apply font-mono px-1.5 py-0.5 m-0 text-[85%] bg-[rgba(175,184,193,0.2)] dark:bg-[#353d48] rounded-md;
+}
+
+.markdown-body pre code {
+  @apply p-0 m-0 text-base bg-transparent rounded-none;
+}
+
+.markdown-body kbd {
+  @apply inline-block px-1.5 py-[3px] font-mono text-[11px] leading-[10px] text-[#24292f] dark:text-[#c9d1d9] align-middle bg-[#f6f8fa] dark:bg-[#161b22] border border-[#d0d7de] dark:border-[#30363d] rounded-md shadow-[inset_0_-1px_0_#c6cbd1] dark:shadow-[inset_0_-1px_0_#30363d] border-b-[#c6cbd1];
+}
+
+/* Custom page scrollbar */
+::-webkit-scrollbar {
+  @apply w-[14px] h-[14px];
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-white dark:bg-[#0d1117];
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[#cbd5e1] dark:bg-[#4f5b6b] rounded-[7px] border-4 border-solid border-white dark:border-[#0d1117] bg-clip-content hover:bg-[#94a3b8] dark:hover:bg-[#647080];
+}
+
+/* Custom scrollbar for code blocks */
+.markdown-body pre::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.markdown-body pre::-webkit-scrollbar-thumb {
+  @apply bg-black/20 dark:bg-white/20 border-4 border-transparent hover:bg-black/30 dark:hover:bg-white/30;
+}

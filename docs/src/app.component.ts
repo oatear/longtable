@@ -5,7 +5,7 @@ import { Cell, ColumnConfig, DropdownOption, SpreadsheetTheme } from '@longtable
 import { longLight, longDark, cosmicDark, goldDust } from '@longtable/angular-spreadsheet';
 import { SafeHtmlPipe } from './safe-html.pipe';
 
-declare var marked: { parse: (markdown: string) => string };
+import { marked } from 'marked';
 
 @Component({
   selector: 'app-root',
@@ -88,10 +88,10 @@ export class AppComponent implements OnInit {
   }
 
   async loadDocs() {
-    if (typeof marked === 'undefined') {
-      console.error('Marked library not loaded.');
-      return;
-    }
+    // if (typeof marked === 'undefined') {
+    //   console.error('Marked library not loaded.');
+    //   return;
+    // }
 
     const docFiles = {
       introduction: 'docs/introduction.md',

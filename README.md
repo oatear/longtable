@@ -87,7 +87,72 @@ Use this if you are actively modifying the library and want changes to reflect i
     npm link oatear-longtable
     ```
 
-## Basic Usage
+## Setup
+ 
+ After installing the library, you need to configure your project to support the library's styling and icons.
+ 
+ ### 1. Install Dependencies
+ 
+ Ensure you have Tailwind CSS and PrimeIcons installed:
+ 
+ ```bash
+ npm install tailwindcss primeicons
+ ```
+ 
+ ### 2. Configure Tailwind CSS
+ 
+ Update your `tailwind.config.js` to include the library's files in the `content` array. This ensures that the Tailwind utility classes used by the library are generated.
+ 
+ ```javascript
+ /** @type {import('tailwindcss').Config} */
+ module.exports = {
+   content: [
+     "./src/**/*.{html,ts}",
+     "./node_modules/oatear-longtable/**/*.{html,ts,mjs}" // Add this line
+   ],
+   theme: {
+     extend: {},
+   },
+   plugins: [],
+ }
+ ```
+ 
+ ### 3. Import Styles
+ 
+ You have two options for importing styles:
+ 
+ **Option A: Use Prebuilt Styles (Recommended)**
+ 
+ Import the prebuilt CSS file which includes all necessary Tailwind utilities and PrimeIcons. This is the easiest way to get started.
+ 
+ ```css
+ @import 'oatear-longtable/prebuilt-styles.css';
+ ```
+ 
+ **Option B: Manual Configuration**
+ 
+ If you prefer to integrate the library's styles into your own Tailwind build (e.g., for customization), use the following setup:
+ 
+ 1.  **Configure Tailwind**: Update `tailwind.config.js` to include the library's files:
+     ```javascript
+     module.exports = {
+       content: [
+         "./src/**/*.{html,ts}",
+         "./node_modules/oatear-longtable/**/*.{html,ts,mjs}"
+       ],
+       // ...
+     }
+     ```
+ 
+ 2.  **Import Directives**: In your global styles file:
+     ```css
+     @import 'primeicons/primeicons.css';
+     @tailwind base;
+     @tailwind components;
+     @tailwind utilities;
+     ```
+ 
+ ## Basic Usage
 
 To use the Longtable spreadsheet, you need to provide two main inputs: `data` and `columnConfig`, both as Angular `WritableSignal`s. You can also listen for changes using the `onDataChange` and `onColumnChange` outputs.
 
@@ -147,6 +212,7 @@ export class AppComponent {
 | -------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `data`         | `WritableSignal<Cell[][]>`         | **Required**. The 2D array of `Cell` objects that represents the spreadsheet grid's data rows.                                             |
 | `columnConfig` | `WritableSignal<ColumnConfig[]>` | **Required**. An array of configuration objects, one for each column, controlling properties like headers, width, and cell editors. |
+| `height`       | `string \| number`               | Optional. Sets the height of the spreadsheet container. Supports `'auto'` (height of content), `'100%'`/`'full'` (fill parent), or specific pixel values (number or string like `'500px'`). Defaults to `'60vh'`. |
 
 ### Outputs
 

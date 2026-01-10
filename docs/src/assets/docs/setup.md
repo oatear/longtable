@@ -17,9 +17,21 @@ To use the Longtable spreadsheet, you need to provide two main inputs: `data` an
 ```html
 <long-spreadsheet 
   [data]="initialData" 
-  [columnConfig]="columnConfig">
+  [columnConfig]="columnConfig"
+  [height]="'500px'">
 </long-spreadsheet>
 ```
+
+### Configuration
+
+You can customize the spreadsheet's appearance and behavior using optional inputs:
+
+- **Height**: Control the spreadsheet container's height using the `height` input.
+    - `'auto'`: Stretches to fit the number of rows.
+    - `'100%'` or `'full'`: Fills the parent container's height.
+    - `number` (e.g., `500`): Sets height in pixels.
+    - `string` (e.g., `'500px'`, `'80vh'`): Sets specific CSS height values.
+    - *Default*: `'60vh'`
 
 ### 3. Provide Data
 

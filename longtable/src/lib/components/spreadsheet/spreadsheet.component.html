@@ -1,8 +1,10 @@
-<div #rootContainer class="relative" [style.font-family]="'var(--lt-font-family-main, sans-serif)'">
+<div #rootContainer class="relative long-spreadsheet-root"
+  [style.font-family]="'var(--lt-font-family-main, sans-serif)'">
   <input type="file" #csvImporter style="display: none" (change)="onCSVFileSelected($event)" accept=".csv">
   <div #spreadsheetContainer [class]="spreadsheetContainerClasses()" [style.background]="'var(--lt-bg-primary, white)'"
-    tabindex="0">
-    <table #spreadsheetTable class="table-fixed border-separate border-spacing-0 leading-[12px] relative"
+    [style.height]="containerHeight()" class="long-spreadsheet-container" tabindex="0">
+    <table #spreadsheetTable
+      class="table-fixed border-separate border-spacing-0 leading-[12px] relative long-spreadsheet-table"
       [style.font-family]="'var(--lt-font-family-mono, monospace)'"
       style="width: -webkit-fill-available; font-size: var(--lt-font-table-cell, 12px);">
       <colgroup>
@@ -13,10 +15,11 @@
         }
         }
       </colgroup>
-      <thead class="sticky top-0 z-40 shadow-sm bg-[var(--lt-bg-header,theme(colors.slate.100))]">
+      <thead
+        class="sticky top-0 z-40 shadow-sm bg-[var(--lt-bg-header,theme(colors.slate.100))] long-spreadsheet-header-row">
         <tr>
           <th (click)="selectAllCells()" (contextmenu)="onHeaderCornerContextMenu($event)"
-            class="sticky left-0 w-12 min-w-[3rem] text-center align-middle border-r border-b z-50 cursor-pointer text-[var(--lt-icon-default,theme(colors.slate.400))] bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))]"
+            class="sticky left-0 w-12 min-w-[3rem] text-center align-middle border-r border-b z-50 cursor-pointer text-[var(--lt-icon-default,theme(colors.slate.400))] bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] long-spreadsheet-header-corner"
             style="display: table-cell; padding: 7px 10px;">
             <i class="pi pi-table"></i>
           </th>
@@ -24,7 +27,7 @@
           <th [attr.data-col-index]="c" (contextmenu)="onColumnContextMenu($event, c)"
             (dblclick)="openColumnSettings(c)" (mouseenter)="onHeaderMouseEnter($event, c)"
             (mouseleave)="onHeaderMouseLeave()" [class.opacity-50]="isColumnDragged().has(c)"
-            class="group relative border-r border-b font-semibold cursor-grab bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] text-[var(--lt-text-header,theme(colors.gray.600))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))]"
+            class="group relative border-r border-b font-semibold cursor-grab bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] text-[var(--lt-text-header,theme(colors.gray.600))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] long-spreadsheet-header-cell"
             style="padding: 7px 10px;">
             <div class="flex items-center justify-between gap-2">
               <span class="truncate">{{ col.name }}</span>
@@ -58,9 +61,9 @@
       </thead>
       <tbody>
         @for (item of displayedRows(); track item.originalModelIndex; let r = $index) {
-        <tr>
+        <tr class="long-spreadsheet-row">
           <th [attr.data-row-index]="r" (contextmenu)="onRowContextMenu($event, r)"
-            class="sticky left-0 w-12 min-w-[3rem] border-r border-b font-semibold z-30 align-top cursor-pointer bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] text-[var(--lt-text-header,theme(colors.gray.600))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))]"
+            class="sticky left-0 w-12 min-w-[3rem] border-r border-b font-semibold z-30 align-top cursor-pointer bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] text-[var(--lt-text-header,theme(colors.gray.600))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] long-spreadsheet-row-header-cell"
             style="padding: 7px 10px;">
             {{ r + 1 }}
           </th>
@@ -70,7 +73,7 @@
             (contextmenu)="onCellContextMenu($event, item.originalModelIndex, c)"
             (mouseenter)="onCellMouseEnter($event, item.originalModelIndex, c)" (mouseleave)="onCellMouseLeave()"
             style="padding: 7px 10px;"
-            class="border-r border-b relative whitespace-pre-wrap align-top {{ isEditing(item.originalModelIndex,c) ? 'invisible' : '' }} {{ getCell(item.originalModelIndex, c)?.readOnly ? 'text-[var(--lt-text-read-only,theme(colors.gray.500))] bg-[var(--lt-bg-primary,transparent)]' : 'text-[var(--lt-text-primary,theme(colors.gray.900))]' }} {{ isCellInvalid(item.originalModelIndex, c) ? '!bg-[var(--lt-bg-invalid,theme(colors.red.100))]' : (isSelected(item.originalModelIndex,c) ? 'bg-[var(--lt-bg-selection,theme(colors.blue.100))]' : '') }} {{ isSelected(item.originalModelIndex,c) ? 'border-transparent' : 'border-[var(--lt-border-grid,theme(colors.slate.200))]' }}">
+            class="border-r border-b relative whitespace-pre-wrap align-top long-spreadsheet-cell {{ isEditing(item.originalModelIndex,c) ? 'invisible' : '' }} {{ getCell(item.originalModelIndex, c)?.readOnly ? 'text-[var(--lt-text-read-only,theme(colors.gray.500))] bg-[var(--lt-bg-primary,transparent)]' : 'text-[var(--lt-text-primary,theme(colors.gray.900))]' }} {{ isCellInvalid(item.originalModelIndex, c) ? '!bg-[var(--lt-bg-invalid,theme(colors.red.100))]' : (isSelected(item.originalModelIndex,c) ? 'bg-[var(--lt-bg-selection,theme(colors.blue.100))]' : '') }} {{ isSelected(item.originalModelIndex,c) ? 'border-transparent' : 'border-[var(--lt-border-grid,theme(colors.slate.200))]' }}">
             @if (isCellInvalid(item.originalModelIndex, c)) {
             <div
               class="absolute top-0 right-0 w-0 h-0 border-solid z-20 border-b-[4px] border-l-[4px] border-t-[4px] border-r-[4px] border-b-transparent border-l-transparent border-t-[#ff0000] border-r-[#ff0000]"
@@ -112,7 +115,7 @@
     @if (getCell(coords.row, coords.col); as cell) {
     @if (columnConfig()()[coords.col]?.editor === 'dropdown') {
     <div #dropdownEditor (mousedown)="$event.stopPropagation()"
-      class="absolute z-[70] flex flex-col rounded-md shadow-lg border-2 border-[var(--lt-border-editing,theme(colors.blue.600))]"
+      class="absolute z-[70] flex flex-col rounded-md shadow-lg border-2 border-[var(--lt-border-editing,theme(colors.blue.600))] long-spreadsheet-floating-editor"
       [style.top.px]="pos.top" [style.left.px]="pos.left" [style.width.px]="pos.width"
       [style.background]="'var(--lt-popup-bg)'">
       <div class="p-2 border-b border-[var(--lt-border-default,theme(colors.slate.200))]">
@@ -147,7 +150,7 @@
     </div>
     } @else {
     <div
-      class="absolute z-[70] box-border border-2 bg-[var(--lt-input-bg,white)] border-[var(--lt-border-editing,theme(colors.blue.600))]"
+      class="absolute z-[70] box-border border-2 bg-[var(--lt-input-bg,white)] border-[var(--lt-border-editing,theme(colors.blue.600))] long-spreadsheet-floating-editor"
       [style.top.px]="pos.top" [style.left.px]="pos.left" [style.width.px]="pos.width" [style.height.px]="pos.height"
       [style.padding]="'7px 10px'">
       <textarea #editingInput [(ngModel)]="editValue" (blur)="onEditBlur()" (keydown)="onEditKeyDown($event)"
@@ -177,7 +180,7 @@
       [style]="dropIndicatorPosition()"></div>
     }
 
-    <div #filterPopupEl>
+    <div #filterPopupEl class="long-spreadsheet-filter-popup-container">
       @if (activeFilterPopup(); as popup) {
       <long-filter-popup [isVisible]="!!popup" [position]="filterPopupPosition()"
         [uniqueValues]="currentFilterUniqueValues()" [initialSelection]="filterPopupInitialSelection()"
@@ -211,8 +214,8 @@
 
   <!-- Popups and Modals -->
   <long-context-menu #contextMenuEl [isVisible]="isContextMenuVisible()" [position]="contextMenuPosition()"
-    [type]="contextMenuType()" [data]="contextMenuData()" (menuAction)="handleContextMenuAction($event)"
-    [appendTo]="'body'" [theme]="theme()"></long-context-menu>
+    class="long-spreadsheet-context-menu" [type]="contextMenuType()" [data]="contextMenuData()"
+    (menuAction)="handleContextMenuAction($event)" [appendTo]="'body'" [theme]="theme()"></long-context-menu>
 
   <!-- Header Tooltip -->
   @if (isHeaderTooltipVisible() && headerTooltipContent(); as content) {

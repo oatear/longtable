@@ -145,7 +145,17 @@ export class SpreadsheetComponent implements OnDestroy {
   rows = computed(() => this.data()() || []);
   colsCount = computed(() => this.columnConfig()().length || 0);
 
-  spreadsheetContainerClasses = computed(() => `w-full h-[60vh] overflow-auto border rounded-[10px] relative select-none focus:outline-none border-[var(--lt-border-default,theme(colors.slate.200))] ${this.uniqueId}`);
+  height = input<string | number>('60vh');
+
+  spreadsheetContainerClasses = computed(() => `w-full overflow-auto border rounded-[10px] relative select-none focus:outline-none border-[var(--lt-border-default,theme(colors.slate.200))] ${this.uniqueId}`);
+
+  containerHeight = computed(() => {
+    const h = this.height();
+    if (h === 'auto' || h === 'full' || h === '100%') {
+      return h === 'auto' ? 'auto' : '100%';
+    }
+    return typeof h === 'number' ? `${h}px` : h;
+  });
 
   themeCssVariables = computed(() => {
     const theme = this.theme();
@@ -1374,16 +1384,16 @@ export class SpreadsheetComponent implements OnDestroy {
     const colIndex = this.contextMenuCoords()!.col;
     this.recordHistory();
     const newColName = this.getNewColumnName();
-    this.data().update(grid => grid.map(row => { row.splice(colIndex, 0, { value: '' }); return row; }));
-    this.columnConfig().update(c => { c.splice(colIndex, 0, { name: newColName, field: this._toKebabCase(newColName) }); return c; });
+    this.data().update(grid => grid.map(row => { const newRow = [...row]; newRow.splice(colIndex, 0, { value: '' }); return newRow; }));
+    this.columnConfig().update(c => { const newC = [...c]; newC.splice(colIndex, 0, { name: newColName, field: this._toKebabCase(newColName) }); return newC; });
   }
 
   insertColumnRight() {
     const colIndex = this.contextMenuCoords()!.col;
     this.recordHistory();
     const newColName = this.getNewColumnName();
-    this.data().update(grid => grid.map(row => { row.splice(colIndex + 1, 0, { value: '' }); return row; }));
-    this.columnConfig().update(c => { c.splice(colIndex + 1, 0, { name: newColName, field: this._toKebabCase(newColName) }); return c; });
+    this.data().update(grid => grid.map(row => { const newRow = [...row]; newRow.splice(colIndex + 1, 0, { value: '' }); return newRow; }));
+    this.columnConfig().update(c => { const newC = [...c]; newC.splice(colIndex + 1, 0, { name: newColName, field: this._toKebabCase(newColName) }); return newC; });
   }
 
   deleteColumn() {
@@ -1392,8 +1402,8 @@ export class SpreadsheetComponent implements OnDestroy {
     this.recordHistory();
     const { start, end } = this.normalizeRange(selection);
     const count = end.col - start.col + 1;
-    this.data().update(grid => grid.map(row => { row.splice(start.col, count); return row; }));
-    this.columnConfig().update(c => { c.splice(start.col, count); return c; });
+    this.data().update(grid => grid.map(row => { const newRow = [...row]; newRow.splice(start.col, count); return newRow; }));
+    this.columnConfig().update(c => { const newC = [...c]; newC.splice(start.col, count); return newC; });
     this.activeCell.set(null);
     this.selectionRanges.set([]);
   }
