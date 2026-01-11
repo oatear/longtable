@@ -1,5 +1,5 @@
 <div #rootContainer class="relative long-spreadsheet-root"
-  [style.font-family]="'var(--lt-font-family-main, sans-serif)'">
+  [style.font-family]="'var(--lt-font-family-main, sans-serif)'" [style.height]="isFullHeight() ? '100%' : null">
   <input type="file" #csvImporter style="display: none" (change)="onCSVFileSelected($event)" accept=".csv">
   <div #spreadsheetContainer [class]="spreadsheetContainerClasses()" [style.background]="'var(--lt-bg-primary, white)'"
     [style.height]="containerHeight()" class="long-spreadsheet-container" tabindex="0">

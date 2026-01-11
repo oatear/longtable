@@ -33,6 +33,12 @@ export class ColumnEditorComponent {
     });
   }
 
+  isLocked = computed(() => {
+    const idx = this.columnIndex();
+    if (idx === null) return false;
+    return this.columnConfig()()[idx]?.lockSettings ?? false;
+  });
+
   private initializeForm(): void {
     const idx = this.columnIndex();
     if (idx === null) {
@@ -47,7 +53,7 @@ export class ColumnEditorComponent {
     const currentWidth = config?.width;
     const currentDescription = config?.description;
 
-    const currentOptions = currentOptionsRaw.map(opt => 
+    const currentOptions = currentOptionsRaw.map(opt =>
       typeof opt === 'string'
         ? { value: opt, color: '#e5e7eb' }
         : { value: opt.value, color: opt.color || '#e5e7eb' }
@@ -104,14 +110,14 @@ export class ColumnEditorComponent {
     const colIndex = this.columnIndex();
     const formState = this.form();
     if (colIndex === null || !formState) return;
-    
-    const config = this.columnConfig()()[colIndex] ?? { name: '', field: ''};
+
+    const config = this.columnConfig()()[colIndex] ?? { name: '', field: '' };
     const newConfig: ColumnConfig = { ...config };
 
-    newConfig.width = (formState.widthValue != null && String(formState.widthValue).trim() !== '') 
-      ? Math.max(60, Number(formState.widthValue)) 
+    newConfig.width = (formState.widthValue != null && String(formState.widthValue).trim() !== '')
+      ? Math.max(60, Number(formState.widthValue))
       : 135;
-      
+
     if (formState.description) {
       newConfig.description = formState.description;
     } else {

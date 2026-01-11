@@ -49,7 +49,7 @@ export class AppComponent implements OnInit {
       { name: 'HP', field: 'hp', width: 80, description: "Hit Points, representing the character's health.", editor: 'numeric' },
       { name: 'Allegiance', field: 'allegiance', width: 180, description: "The faction or group the character is aligned with.", editor: 'dropdown', options: this.allegianceOptions },
       { name: 'Has Familiar', field: 'has-familiar', width: 120, description: "Indicates if the character is accompanied by a magical companion.", editor: 'checkbox' },
-      { name: 'Count', field: 'count', width: 80, description: "Multiplier for statistics.", editor: 'numeric' }
+      { name: 'Count', field: 'count', width: 80, description: "Multiplier for statistics.", editor: 'numeric', lockSettings: true }
     ]
   );
 

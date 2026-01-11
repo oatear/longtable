@@ -27,6 +27,7 @@ export interface ColumnConfig {
   description?: string;
   editor?: ColumnType;
   options?: (string | DropdownOption)[];
+  lockSettings?: boolean;
 }
 
 export interface ContextMenuData {

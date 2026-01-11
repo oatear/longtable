@@ -33,6 +33,7 @@ import { TableStatsComponent } from '../table-stats/table-stats.component';
     '(document:mousemove)': 'onDocumentMouseMove($event)',
     '(document:mouseup)': 'onDocumentMouseUp($event)',
     '[style]': 'themeCssVariables()',
+    '[style.height]': 'isFullHeight() ? "100%" : null',
   }
 })
 export class SpreadsheetComponent implements OnDestroy {
@@ -155,6 +156,11 @@ export class SpreadsheetComponent implements OnDestroy {
       return h === 'auto' ? 'auto' : '100%';
     }
     return typeof h === 'number' ? `${h}px` : h;
+  });
+
+  isFullHeight = computed(() => {
+    const h = this.height();
+    return h === 'full' || h === '100%';
   });
 
   themeCssVariables = computed(() => {

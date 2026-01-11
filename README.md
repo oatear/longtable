@@ -247,6 +247,7 @@ interface ColumnConfig {
   description?: string;
   editor?: 'text' | 'dropdown' | 'checkbox' | 'numeric';
   options?: (string | DropdownOption)[];
+  lockSettings?: boolean;
 }
 
 interface DropdownOption {
