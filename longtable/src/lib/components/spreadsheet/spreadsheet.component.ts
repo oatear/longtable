@@ -219,16 +219,17 @@ export class SpreadsheetComponent implements OnDestroy {
     return `
       /* Main spreadsheet scrollbar */
       ${selector}::-webkit-scrollbar {
-        width: 12px;
-        height: 12px;
+        width: 15px;
+        height: 15px;
       }
       ${selector}::-webkit-scrollbar-track {
         background-color: ${sb.track};
       }
       ${selector}::-webkit-scrollbar-thumb {
         background-color: ${sb.thumb};
-        border-radius: 6px;
-        border: 3px solid ${sb.border};
+        border-radius: 10px;
+        border: 4px solid ${sb.border};
+        background-clip: content-box;
       }
       ${selector}::-webkit-scrollbar-thumb:hover {
         background-color: ${sb.thumbHover};
@@ -239,15 +240,17 @@ export class SpreadsheetComponent implements OnDestroy {
 
       /* Modal scrollbars within this spreadsheet instance */
       ${selector} .modal-scroll-content::-webkit-scrollbar {
-        width: 12px;
+        width: 15px;
+        height: 15px;
       }
       ${selector} .modal-scroll-content::-webkit-scrollbar-track {
         background-color: ${colors.popupBg};
       }
       ${selector} .modal-scroll-content::-webkit-scrollbar-thumb {
         background-color: ${sb.thumb};
-        border-radius: 6px;
-        border: 3px solid ${colors.popupBg};
+        border-radius: 10px;
+        border: 4px solid ${colors.popupBg};
+        background-clip: content-box;
       }
       ${selector} .modal-scroll-content::-webkit-scrollbar-thumb:hover {
         background-color: ${sb.thumbHover};
@@ -1716,6 +1719,9 @@ export class SpreadsheetComponent implements OnDestroy {
     const update = (c: Coordinates) => ({ ...c, col: oldToNew[c.col] });
     this.selectionRanges.update(r => r.map(range => ({ start: update(range.start), end: update(range.end) })));
     this.activeCell.update(a => a ? update(a) : null);
+
+    // Force layout update after DOM has settled to ensure selection outline is correct
+    setTimeout(() => this.layoutTick.update(v => v + 1), 0);
   }
 
   private escapeHtml = (unsafe: string) => unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&quot;").replace(/'/g, "&#039;");
