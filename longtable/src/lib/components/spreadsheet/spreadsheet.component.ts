@@ -102,10 +102,16 @@ export class SpreadsheetComponent implements OnDestroy {
   isColumnSettingsVisible = signal(false);
   isFindReplaceVisible = signal(false);
   isStatsModalVisible = signal(false);
+
+  // Find and Replace State
+  findQuery = signal('');
+  findOptions = signal({ matchCase: false, matchEntireCell: false });
+  currentFindIndex = signal(-1);
   activeFilterPopup = signal<{ col: number, target: HTMLElement } | null>(null);
 
   // State for child components
   contextMenuPosition = signal({ x: 0, y: 0 });
+  menuLaunchCoords = signal<{ x: number, y: number } | null>(null);
   // Fix: Initialize signal with a default value.
   contextMenuType = signal<'row' | 'cell' | 'col' | 'headerCorner' | null>(null);
   contextMenuCoords = signal<Coordinates | null>(null);
@@ -127,7 +133,7 @@ export class SpreadsheetComponent implements OnDestroy {
   private editingInput = viewChild<ElementRef<HTMLTextAreaElement | HTMLSelectElement>>('editingInput');
   private dropdownEditor = viewChild<ElementRef>('dropdownEditor');
   private dropdownSearchInput = viewChild<ElementRef>('dropdownSearchInput');
-  private contextMenuEl = viewChild<ElementRef>('contextMenuEl');
+  private contextMenuEl = viewChild<ContextMenuComponent>('contextMenuEl');
   private filterPopupEl = viewChild<ElementRef>('filterPopupEl');
   private findReplacePanelEl = viewChild<ElementRef>('findReplacePanelEl');
   private csvImporter = viewChild<ElementRef>('csvImporter');
@@ -299,11 +305,31 @@ export class SpreadsheetComponent implements OnDestroy {
   });
 
   findResults = computed<Coordinates[]>(() => {
-    // Logic remains here as it's core to spreadsheet state
-    // but driven by FindReplaceComponent's state via inputs.
-    // This logic would be moved to the new component and communicated via outputs.
-    // For this refactoring, we'll keep it here for simplicity of demonstration.
-    return []; // Simplified for this example
+    const query = this.findQuery();
+    if (!query) return [];
+
+    const options = this.findOptions();
+    const results: Coordinates[] = [];
+    const searchQuery = options.matchCase ? query : query.toLowerCase();
+
+    this.rows().forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        const cellValue = String(cell?.value ?? '');
+        const compareValue = options.matchCase ? cellValue : cellValue.toLowerCase();
+
+        if (options.matchEntireCell) {
+          if (compareValue === searchQuery) {
+            results.push({ row: rowIndex, col: colIndex });
+          }
+        } else {
+          if (compareValue.includes(searchQuery)) {
+            results.push({ row: rowIndex, col: colIndex });
+          }
+        }
+      });
+    });
+
+    return results;
   });
 
   selectionRangePositions = computed(() => {
@@ -513,59 +539,6 @@ export class SpreadsheetComponent implements OnDestroy {
       }
     });
 
-    effect(() => {
-      if (this.isContextMenuVisible()) {
-        setTimeout(() => {
-          const menuHostEl = this.contextMenuEl()?.nativeElement;
-          if (!menuHostEl) return;
-          const menuPopupEl = menuHostEl.firstElementChild as HTMLElement;
-          if (!menuPopupEl) return;
-
-          const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuPopupEl;
-          if (menuWidth === 0 || menuHeight === 0) return;
-
-          const clickX = this.contextMenuPosition().x;
-          const clickY = this.contextMenuPosition().y;
-
-          const viewportWidth = window.innerWidth;
-          const viewportHeight = window.innerHeight;
-          const margin = 5;
-
-          // Start with default position (right and down of click)
-          let finalX = clickX;
-          let finalY = clickY;
-
-          // If it goes off the right edge, move it to the left of the click
-          if (finalX + menuWidth + margin > viewportWidth) {
-            finalX = clickX - menuWidth;
-          }
-
-          // If it goes off the bottom edge, move it above the click
-          if (finalY + menuHeight + margin > viewportHeight) {
-            finalY = clickY - menuHeight;
-          }
-
-          // After potential flipping, clamp the position to the viewport boundaries.
-          if (finalX < margin) {
-            finalX = margin;
-          }
-          if (finalY < margin) {
-            finalY = margin;
-          }
-
-          if (finalX + menuWidth + margin > viewportWidth) {
-            finalX = viewportWidth - menuWidth - margin;
-          }
-          if (finalY + menuHeight + margin > viewportHeight) {
-            finalY = viewportHeight - menuHeight - margin;
-          }
-
-          this.contextMenuPosition.set({ x: finalX, y: finalY });
-        }, 0);
-      }
-    });
-
-    effect(() => this.validateData(this.data()()));
     effect(() => { if (this.activeFilterPopup()) setTimeout(() => this.filterPopupEl()?.nativeElement.querySelector('input')?.focus(), 0); });
     effect(() => { if (this.isDraggingColumn()) document.body.style.cursor = 'grabbing'; else document.body.style.cursor = ''; });
 
@@ -687,8 +660,189 @@ export class SpreadsheetComponent implements OnDestroy {
   getOptionColor = (option: string | DropdownOption) => typeof option === 'string' ? undefined : option.color;
 
   getHighlightedCellContent(modelRow: number, modelCol: number): string {
-    // This logic would move to the FindReplace component
-    return this.escapeHtml(String(this.getCell(modelRow, modelCol)?.value ?? ''));
+    const cellValue = String(this.getCell(modelRow, modelCol)?.value ?? '');
+    const query = this.findQuery();
+
+    if (!query) {
+      return this.escapeHtml(cellValue);
+    }
+
+    const options = this.findOptions();
+    const escapedValue = this.escapeHtml(cellValue);
+    const escapedQuery = this.escapeHtml(query);
+
+    if (options.matchEntireCell) {
+      const matches = options.matchCase
+        ? cellValue === query
+        : cellValue.toLowerCase() === query.toLowerCase();
+      return matches ? `<mark class="bg-yellow-300 text-gray-900">${escapedValue}</mark>` : escapedValue;
+    }
+
+    // For partial matches, we need to highlight all occurrences
+    const flags = options.matchCase ? 'g' : 'gi';
+    const regex = new RegExp(this.escapeRegex(query), flags);
+
+    // Find all matches and their positions in the original string
+    let result = '';
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(cellValue)) !== null) {
+      // Add text before the match
+      result += this.escapeHtml(cellValue.slice(lastIndex, match.index));
+      // Add the highlighted match
+      result += `<mark class="bg-yellow-300 text-gray-900">${this.escapeHtml(match[0])}</mark>`;
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text after last match
+    result += this.escapeHtml(cellValue.slice(lastIndex));
+
+    return result;
+  }
+
+  private escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // --- Find and Replace Methods ---
+  onFindQueryChange(query: string): void {
+    this.findQuery.set(query);
+    // Reset to first result when query changes
+    if (this.findResults().length > 0) {
+      this.currentFindIndex.set(0);
+      this.navigateToCurrentMatch();
+    } else {
+      this.currentFindIndex.set(-1);
+    }
+  }
+
+  onFindOptionsChange(options: { matchCase: boolean, matchEntireCell: boolean }): void {
+    this.findOptions.set(options);
+    // Reset to first result when options change
+    if (this.findResults().length > 0) {
+      this.currentFindIndex.set(0);
+      this.navigateToCurrentMatch();
+    } else {
+      this.currentFindIndex.set(-1);
+    }
+  }
+
+  navigateToNextMatch(): void {
+    const results = this.findResults();
+    if (results.length === 0) return;
+
+    const nextIndex = (this.currentFindIndex() + 1) % results.length;
+    this.currentFindIndex.set(nextIndex);
+    this.navigateToCurrentMatch();
+  }
+
+  navigateToPrevMatch(): void {
+    const results = this.findResults();
+    if (results.length === 0) return;
+
+    const prevIndex = (this.currentFindIndex() - 1 + results.length) % results.length;
+    this.currentFindIndex.set(prevIndex);
+    this.navigateToCurrentMatch();
+  }
+
+  private navigateToCurrentMatch(): void {
+    const results = this.findResults();
+    const index = this.currentFindIndex();
+    if (index < 0 || index >= results.length) return;
+
+    const coords = results[index];
+    // Select the cell and scroll to it
+    const visualCoords = this.modelToVisualCoords(coords);
+    if (visualCoords) {
+      this.activeCell.set(visualCoords);
+      this.selectionRanges.set([{ start: visualCoords, end: visualCoords }]);
+      this.scrollCellIntoView(coords, visualCoords);
+    }
+  }
+
+  replaceCurrentMatch(replacement: string): void {
+    const results = this.findResults();
+    const index = this.currentFindIndex();
+    if (index < 0 || index >= results.length) return;
+
+    const coords = results[index];
+    const cell = this.getCell(coords.row, coords.col);
+    if (!cell || cell.readOnly) return;
+
+    this.recordHistory();
+    const query = this.findQuery();
+    const options = this.findOptions();
+    const cellValue = String(cell.value ?? '');
+
+    let newValue: string;
+    if (options.matchEntireCell) {
+      newValue = replacement;
+    } else {
+      const flags = options.matchCase ? 'g' : 'gi';
+      const regex = new RegExp(this.escapeRegex(query), flags);
+      newValue = cellValue.replace(regex, replacement);
+    }
+
+    this.data().update(grid => {
+      const newGrid = grid.map(r => [...r]);
+      newGrid[coords.row][coords.col] = { ...newGrid[coords.row][coords.col], value: newValue };
+      return newGrid;
+    });
+
+    // Move to next match if available
+    setTimeout(() => {
+      if (this.findResults().length > 0) {
+        // Adjust index if current was removed
+        const newIndex = Math.min(index, this.findResults().length - 1);
+        this.currentFindIndex.set(newIndex);
+        this.navigateToCurrentMatch();
+      } else {
+        this.currentFindIndex.set(-1);
+      }
+    }, 0);
+  }
+
+  replaceAllMatches(replacement: string): void {
+    const results = this.findResults();
+    if (results.length === 0) return;
+
+    this.recordHistory();
+    const query = this.findQuery();
+    const options = this.findOptions();
+
+    this.data().update(grid => {
+      const newGrid = grid.map(r => [...r]);
+
+      results.forEach(coords => {
+        const cell = newGrid[coords.row][coords.col];
+        if (cell.readOnly) return;
+
+        const cellValue = String(cell.value ?? '');
+        let newValue: string;
+
+        if (options.matchEntireCell) {
+          newValue = replacement;
+        } else {
+          const flags = options.matchCase ? 'g' : 'gi';
+          const regex = new RegExp(this.escapeRegex(query), flags);
+          newValue = cellValue.replace(regex, replacement);
+        }
+
+        newGrid[coords.row][coords.col] = { ...cell, value: newValue };
+      });
+
+      return newGrid;
+    });
+
+    // Clear find state after replace all
+    this.currentFindIndex.set(-1);
+  }
+
+  closeFindReplace(): void {
+    this.isFindReplaceVisible.set(false);
+    this.findQuery.set('');
+    this.currentFindIndex.set(-1);
   }
 
   getColumnWidth = (colIndex: number) => `${this.columnConfig()()[colIndex]?.width ?? 135}px`;
@@ -1278,6 +1432,64 @@ export class SpreadsheetComponent implements OnDestroy {
   }
 
   // --- Context Menu Logic ---
+  private adjustContextMenuPosition() {
+    // If menu was closed, stop.
+    if (!this.isContextMenuVisible()) return;
+
+    const menuHostEl = (this.contextMenuEl() as any)?.elementRef.nativeElement;
+    const containerEl = this.rootContainer()?.nativeElement;
+
+    if (!menuHostEl || !containerEl) {
+      setTimeout(() => this.adjustContextMenuPosition(), 10);
+      return;
+    }
+
+    const menuPopupEl = menuHostEl.querySelector('.long-spreadsheet-context-menu > div') as HTMLElement || menuHostEl.firstElementChild as HTMLElement;
+
+    if (!menuPopupEl) {
+      setTimeout(() => this.adjustContextMenuPosition(), 10);
+      return;
+    }
+
+    const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuPopupEl;
+
+    if (menuWidth === 0 || menuHeight === 0) {
+      setTimeout(() => this.adjustContextMenuPosition(), 10);
+      return;
+    }
+
+    const launchCoords = this.menuLaunchCoords();
+    if (!launchCoords) return;
+
+    const clickX = launchCoords.x;
+    const clickY = launchCoords.y;
+
+    const containerRect = containerEl.getBoundingClientRect();
+    const margin = 5;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    const boundRight = Math.min(containerRect.right, viewportWidth);
+    const boundBottom = Math.min(containerRect.bottom, viewportHeight);
+    const boundLeft = Math.max(containerRect.left, 0);
+    const boundTop = Math.max(containerRect.top, 0);
+
+    let finalX = clickX;
+    let finalY = clickY;
+
+    if (finalX + menuWidth + margin > boundRight) finalX = clickX - menuWidth;
+    if (finalY + menuHeight + margin > boundBottom) finalY = clickY - menuHeight;
+
+    const maxLeft = boundRight - menuWidth - margin;
+    const minLeft = boundLeft + margin;
+
+    finalX = Math.max(minLeft, Math.min(finalX, maxLeft));
+    finalY = Math.max(boundTop + margin, Math.min(finalY, boundBottom - menuHeight - margin));
+
+    this.contextMenuPosition.set({ x: finalX, y: finalY });
+  }
+
   onDocumentMouseDown(event: MouseEvent) {
     const target = event.target as HTMLElement;
 
@@ -1344,8 +1556,11 @@ export class SpreadsheetComponent implements OnDestroy {
   }
 
   private openContextMenu(event: MouseEvent) {
+    this.menuLaunchCoords.set({ x: event.clientX, y: event.clientY });
     this.contextMenuPosition.set({ x: event.clientX, y: event.clientY });
     this.isContextMenuVisible.set(true);
+    // Defer adjustment slightly to allow initial render
+    setTimeout(() => this.adjustContextMenuPosition(), 0);
   }
   closeContextMenu = () => { this.isContextMenuVisible.set(false); this.contextMenuType.set(null); this.contextMenuCoords.set(null); }
 

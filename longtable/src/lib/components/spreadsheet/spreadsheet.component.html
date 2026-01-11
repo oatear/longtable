@@ -94,7 +94,7 @@
               <span class="h-2 w-2 rounded-full mr-2 flex-shrink-0" [style.backgroundColor]="color"></span>
               }
               }
-              <span>{{ getCell(item.originalModelIndex, c)?.value }}</span>
+              <span [innerHTML]="getHighlightedCellContent(item.originalModelIndex, c)"></span>
             </div>
             }
             @if (isFillHandleVisible(item.originalModelIndex, c)) {
@@ -190,7 +190,11 @@
     </div>
 
     <long-find-replace #findReplacePanelEl [isVisible]="isFindReplaceVisible()" [container]="spreadsheetContainer"
-      (close)="isFindReplaceVisible.set(false)"></long-find-replace>
+      [resultsCount]="findResults().length" [currentIndex]="currentFindIndex()" [theme]="theme()"
+      (findQueryChange)="onFindQueryChange($event)" (findOptionsChange)="onFindOptionsChange($event)"
+      (navigateNext)="navigateToNextMatch()" (navigatePrev)="navigateToPrevMatch()"
+      (replaceOne)="replaceCurrentMatch($event)" (replaceAll)="replaceAllMatches($event)"
+      (close)="closeFindReplace()"></long-find-replace>
 
     <long-column-editor [isVisible]="isColumnSettingsVisible()" [columnIndex]="columnSettingsColIndex()"
       [allRows]="rows()" [columnConfig]="columnConfig()" (close)="isColumnSettingsVisible.set(false)"
