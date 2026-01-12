@@ -154,7 +154,7 @@ export const cosmicDark: SpreadsheetTheme = {
   colors: {
     ...longDark.colors,
     // Backgrounds with a single subtle purple "nebula" glow
-    bgPrimary: 'radial-gradient(circle at 15% 25%, rgb(199 63 187 / 15%) 0%, rgba(34, 211, 238, 0) 25%), radial-gradient(circle at 85% 75%, rgba(167, 139, 250, 0.12) 0%, rgba(167, 139, 250, 0) 25%), linear-gradient(170deg, #201f28 0%, #282634 100%)',
+    bgPrimary: '#272533',
     bgHeader: '#2c2a38',
     bgHeaderHover: '#383645',
     popupBg: 'radial-gradient(circle at 15% 75%, rgb(199 63 187 / 15%) 0%, rgba(34, 211, 238, 0) 25%), radial-gradient(circle at 80% 20%, rgba(167, 139, 250, 0.1) 0%, rgba(167, 139, 250, 0) 20%), linear-gradient(160deg, #2a2836 0%, #2e2c3b 100%)',

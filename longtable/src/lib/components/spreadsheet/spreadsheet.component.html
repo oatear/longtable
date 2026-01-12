@@ -21,7 +21,11 @@
           <th (click)="selectAllCells()" (contextmenu)="onHeaderCornerContextMenu($event)"
             class="sticky left-0 w-12 min-w-[3rem] text-center align-middle border-r border-b z-50 cursor-pointer text-[var(--lt-icon-default,theme(colors.slate.400))] bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] long-spreadsheet-header-corner"
             style="display: table-cell; padding: 7px 10px;">
+            @if (showLoading()) {
+            <i class="pi pi-spinner-dotted pi-spin"></i>
+            } @else {
             <i class="pi pi-table"></i>
+            }
           </th>
           @for (col of columnConfig()(); track $index; let c = $index) {
           <th [attr.data-col-index]="c" (contextmenu)="onColumnContextMenu($event, c)"

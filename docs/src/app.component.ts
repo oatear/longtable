@@ -25,6 +25,12 @@ export class AppComponent implements OnInit {
     theming: '',
   });
 
+  isLoading = signal(false);
+
+  toggleLoading() {
+    this.isLoading.update(v => !v);
+  }
+
   private classOptions: DropdownOption[] = [
     { value: 'Warrior', color: '#fca5a5' }, // red-300
     { value: 'Mage', color: '#93c5fd' },    // blue-300

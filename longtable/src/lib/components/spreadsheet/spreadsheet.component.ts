@@ -40,6 +40,7 @@ export class SpreadsheetComponent implements OnDestroy {
   data = input.required<WritableSignal<Cell[][]>>();
   columnConfig = input.required<WritableSignal<ColumnConfig[]>>();
   theme = input.required<SpreadsheetTheme>();
+  showLoading = input<boolean>(false);
 
   onDataChange = output<Cell[][]>();
   onColumnChange = output<ColumnConfig[]>();

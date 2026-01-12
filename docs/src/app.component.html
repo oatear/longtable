@@ -48,19 +48,29 @@
             class="text-2xl font-semibold border-b border-gray-200 dark:border-zinc-700 pb-2 mb-4 text-gray-800 dark:text-slate-100">
             Live Demo</h2>
           <div class="bg-white rounded-[10px] shadow-2xl overflow-hidden p-4 dark:bg-[#262c35] mt-6">
-            <div class="mb-4 max-w-xs">
-              <label for="theme-select" class="block text-sm font-medium text-gray-700 dark:text-slate-300">Spreadsheet
-                Theme:</label>
-              <select id="theme-select" (change)="onThemeChange($event)" [value]="selectedSpreadsheetThemeName()"
-                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-[10px] dark:bg-[rgb(24,28,33)] dark:border-slate-600 dark:text-slate-200">
-                <option value="light">Long Light</option>
-                <option value="dark">Long Dark</option>
-                <option value="cosmic-dark">Cosmic Dark</option>
-                <option value="gold-dust">Gold Dust</option>
-              </select>
+            <div class="mb-6 flex flex-wrap items-end gap-x-6 gap-y-4">
+              <div class="w-full sm:w-64">
+                <label for="theme-select"
+                  class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Spreadsheet
+                  Theme:</label>
+                <select id="theme-select" (change)="onThemeChange($event)" [value]="selectedSpreadsheetThemeName()"
+                  class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-[10px] bg-white border dark:bg-[rgb(24,28,33)] dark:border-slate-600 dark:text-slate-200 transition-colors shadow-sm">
+                  <option value="light">Long Light</option>
+                  <option value="dark">Long Dark</option>
+                  <option value="cosmic-dark">Cosmic Dark</option>
+                  <option value="gold-dust">Gold Dust</option>
+                </select>
+              </div>
+              <button (click)="toggleLoading()"
+                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-[10px] hover:bg-gray-50 dark:bg-zinc-800 dark:text-slate-200 dark:border-zinc-600 dark:hover:bg-zinc-700 transition-all shadow-sm active:scale-[0.98]">
+                <i class="pi" [class.pi-spinner]="isLoading()" [class.pi-spin]="isLoading()"
+                  [class.pi-table]="!isLoading()"></i>
+                {{ isLoading() ? 'Hide Loading' : 'Show Loading State' }}
+              </button>
             </div>
             <long-spreadsheet [data]="initialData" [columnConfig]="columnConfig" [theme]="spreadsheetTheme()"
-              (onDataChange)="onDataChanged($event)" (onColumnChange)="onColumnConfigChanged($event)">
+              (onDataChange)="onDataChanged($event)" (onColumnChange)="onColumnConfigChanged($event)"
+              [showLoading]="isLoading()">
             </long-spreadsheet>
           </div>
         </section>
