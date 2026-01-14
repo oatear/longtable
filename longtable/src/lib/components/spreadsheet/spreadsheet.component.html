@@ -1,244 +1,248 @@
-<div #rootContainer class="relative long-spreadsheet-root"
-  [style.font-family]="'var(--lt-font-family-main, sans-serif)'" [style.height]="isFullHeight() ? '100%' : null">
-  <input type="file" #csvImporter style="display: none" (change)="onCSVFileSelected($event)" accept=".csv">
-  <div #spreadsheetContainer [class]="spreadsheetContainerClasses()" [style.background]="'var(--lt-bg-primary, white)'"
-    [style.height]="containerHeight()" class="long-spreadsheet-container" tabindex="0">
-    <table #spreadsheetTable
-      class="table-fixed border-separate border-spacing-0 leading-[12px] relative long-spreadsheet-table"
-      [style.font-family]="'var(--lt-font-family-mono, monospace)'"
-      style="width: -webkit-fill-available; font-size: var(--lt-font-table-cell, 12px);">
-      <colgroup>
-        <col style="width: 3rem;">
-        @if (columnConfig()().length > 0) {
-        @for (col of columnConfig()(); track $index; let c = $index) {
-        <col [style.width]="getColumnWidth(c)">
-        }
-        }
-      </colgroup>
-      <thead
-        class="sticky top-0 z-40 shadow-sm bg-[var(--lt-bg-header,theme(colors.slate.100))] long-spreadsheet-header-row">
-        <tr>
-          <th (click)="selectAllCells()" (contextmenu)="onHeaderCornerContextMenu($event)"
-            class="sticky left-0 w-12 min-w-[3rem] text-center align-middle border-r border-b z-50 cursor-pointer text-[var(--lt-icon-default,theme(colors.slate.400))] bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] long-spreadsheet-header-corner"
-            style="display: table-cell; padding: 7px 10px;">
-            @if (showLoading()) {
-            <i class="pi pi-spinner-dotted pi-spin"></i>
-            } @else {
-            <i class="pi pi-table"></i>
-            }
-          </th>
+<div class="longtable-scope" style="width: 100%; height: 100%;">
+  <div #rootContainer class="relative long-spreadsheet-root"
+    [style.font-family]="'var(--lt-font-family-main, sans-serif)'" [style.height]="isFullHeight() ? '100%' : null">
+    <input type="file" #csvImporter style="display: none" (change)="onCSVFileSelected($event)" accept=".csv">
+    <div #spreadsheetContainer [class]="spreadsheetContainerClasses()"
+      [style.background]="'var(--lt-bg-primary, white)'" [style.height]="containerHeight()"
+      class="long-spreadsheet-container" tabindex="0">
+      <table #spreadsheetTable
+        class="table-fixed border-separate border-spacing-0 leading-[12px] relative long-spreadsheet-table"
+        [style.font-family]="'var(--lt-font-family-mono, monospace)'"
+        style="width: -webkit-fill-available; font-size: var(--lt-font-table-cell, 12px);">
+        <colgroup>
+          <col style="width: 3rem;">
+          @if (columnConfig()().length > 0) {
           @for (col of columnConfig()(); track $index; let c = $index) {
-          <th [attr.data-col-index]="c" (contextmenu)="onColumnContextMenu($event, c)"
-            (dblclick)="openColumnSettings(c)" (mouseenter)="onHeaderMouseEnter($event, c)"
-            (mouseleave)="onHeaderMouseLeave()" [class.opacity-50]="isColumnDragged().has(c)"
-            class="group relative border-r border-b font-semibold cursor-grab bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] text-[var(--lt-text-header,theme(colors.gray.600))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] long-spreadsheet-header-cell"
-            style="padding: 7px 10px;">
-            <div class="flex items-center justify-between gap-2">
-              <span class="truncate">{{ col.name }}</span>
-              <div class="flex items-center text-[var(--lt-icon-default,theme(colors.slate.400))]">
-                <div
-                  class="p-1 rounded-full cursor-pointer hover:bg-[var(--lt-icon-hover-bg,theme(colors.slate.400))] hover:text-[var(--lt-icon-hover-text,theme(colors.slate.800))]"
-                  (click)="toggleSort(c); $event.stopPropagation()">
-                  @if (sortConfig()?.col === c) {
-                  <i
-                    class="pi text-[var(--lt-text-primary,theme(colors.slate.600))] {{ sortConfig()?.direction === 'asc' ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down' }}"></i>
-                  } @else {
-                  <i class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                  }
-                </div>
-                <div
-                  class="filter-toggle-btn p-1 ml-1 rounded-full cursor-pointer hover:bg-[var(--lt-icon-hover-bg,theme(colors.slate.400))] hover:text-[var(--lt-icon-hover-text,theme(colors.slate.800))]"
-                  (click)="toggleFilterPopup(c, $event)">
-                  @if (filterConfig().has(c)) {
-                  <i class="pi pi-filter-fill text-[var(--lt-icon-active,theme(colors.blue.600))]"></i>
-                  } @else {
-                  <i class="pi pi-filter opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                  }
+          <col [style.width]="getColumnWidth(c)">
+          }
+          }
+        </colgroup>
+        <thead
+          class="sticky top-0 z-40 shadow-sm bg-[var(--lt-bg-header,theme(colors.slate.100))] long-spreadsheet-header-row">
+          <tr>
+            <th (click)="selectAllCells()" (contextmenu)="onHeaderCornerContextMenu($event)"
+              class="sticky left-0 w-12 min-w-[3rem] text-center align-middle border-r border-b z-50 cursor-pointer text-[var(--lt-icon-default,theme(colors.slate.400))] bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] long-spreadsheet-header-corner"
+              style="display: table-cell; padding: 7px 10px;">
+              @if (showLoading()) {
+              <i class="pi pi-spinner-dotted pi-spin"></i>
+              } @else {
+              <i class="pi pi-table"></i>
+              }
+            </th>
+            @for (col of columnConfig()(); track $index; let c = $index) {
+            <th [attr.data-col-index]="c" (contextmenu)="onColumnContextMenu($event, c)"
+              (dblclick)="openColumnSettings(c)" (mouseenter)="onHeaderMouseEnter($event, c)"
+              (mouseleave)="onHeaderMouseLeave()" [class.opacity-50]="isColumnDragged().has(c)"
+              class="group relative border-r border-b font-semibold cursor-grab bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] text-[var(--lt-text-header,theme(colors.gray.600))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] long-spreadsheet-header-cell"
+              style="padding: 7px 10px;">
+              <div class="flex items-center justify-between gap-2">
+                <span class="truncate">{{ col.name }}</span>
+                <div class="flex items-center text-[var(--lt-icon-default,theme(colors.slate.400))]">
+                  <div
+                    class="p-1 rounded-full cursor-pointer hover:bg-[var(--lt-icon-hover-bg,theme(colors.slate.400))] hover:text-[var(--lt-icon-hover-text,theme(colors.slate.800))]"
+                    (click)="toggleSort(c); $event.stopPropagation()">
+                    @if (sortConfig()?.col === c) {
+                    <i
+                      class="pi text-[var(--lt-text-primary,theme(colors.slate.600))] {{ sortConfig()?.direction === 'asc' ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down' }}"></i>
+                    } @else {
+                    <i class="pi pi-sort-alt opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    }
+                  </div>
+                  <div
+                    class="filter-toggle-btn p-1 ml-1 rounded-full cursor-pointer hover:bg-[var(--lt-icon-hover-bg,theme(colors.slate.400))] hover:text-[var(--lt-icon-hover-text,theme(colors.slate.800))]"
+                    (click)="toggleFilterPopup(c, $event)">
+                    @if (filterConfig().has(c)) {
+                    <i class="pi pi-filter-fill text-[var(--lt-icon-active,theme(colors.blue.600))]"></i>
+                    } @else {
+                    <i class="pi pi-filter opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    }
+                  </div>
                 </div>
               </div>
-            </div>
-            <div (mousedown)="onColResizeMouseDown($event, c)"
-              class="col-resize-handle absolute top-0 right-0 h-full w-2 cursor-col-resize z-10"></div>
-          </th>
-          }
-        </tr>
-      </thead>
-      <tbody>
-        @for (item of displayedRows(); track item.originalModelIndex; let r = $index) {
-        <tr class="long-spreadsheet-row">
-          <th [attr.data-row-index]="r" (contextmenu)="onRowContextMenu($event, r)"
-            class="sticky left-0 w-12 min-w-[3rem] border-r border-b font-semibold z-30 align-top cursor-pointer bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] text-[var(--lt-text-header,theme(colors.gray.600))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] long-spreadsheet-row-header-cell"
-            style="padding: 7px 10px;">
-            {{ r + 1 }}
-          </th>
-          @for (cell of item.cells; track $index; let c = $index) {
-          <td [attr.data-row]="item.originalModelIndex" [attr.data-col]="c"
-            (dblclick)="onCellDoubleClick(item.originalModelIndex, c)"
-            (contextmenu)="onCellContextMenu($event, item.originalModelIndex, c)"
-            (mouseenter)="onCellMouseEnter($event, item.originalModelIndex, c)" (mouseleave)="onCellMouseLeave()"
-            style="padding: 7px 10px;"
-            class="border-r border-b relative whitespace-pre-wrap align-top long-spreadsheet-cell {{ isEditing(item.originalModelIndex,c) ? 'invisible' : '' }} {{ getCell(item.originalModelIndex, c)?.readOnly ? 'text-[var(--lt-text-read-only,theme(colors.gray.500))] bg-[var(--lt-bg-primary,transparent)]' : 'text-[var(--lt-text-primary,theme(colors.gray.900))]' }} {{ isCellInvalid(item.originalModelIndex, c) ? '!bg-[var(--lt-bg-invalid,theme(colors.red.100))]' : (isSelected(item.originalModelIndex,c) ? 'bg-[var(--lt-bg-selection,theme(colors.blue.100))]' : '') }} {{ isSelected(item.originalModelIndex,c) ? 'border-transparent' : 'border-[var(--lt-border-grid,theme(colors.slate.200))]' }}">
-            @if (isCellInvalid(item.originalModelIndex, c)) {
-            <div
-              class="absolute top-0 right-0 w-0 h-0 border-solid z-20 border-b-[4px] border-l-[4px] border-t-[4px] border-r-[4px] border-b-transparent border-l-transparent border-t-[#ff0000] border-r-[#ff0000]"
-              (mouseenter)="onCellMouseEnter($event, item.originalModelIndex, c)"></div>
+              <div (mousedown)="onColResizeMouseDown($event, c)"
+                class="col-resize-handle absolute top-0 right-0 h-full w-2 cursor-col-resize z-10"></div>
+            </th>
             }
-            @if (columnConfig()()[c]?.editor === 'checkbox') {
-            <div class="flex items-center justify-center w-full h-full" (dblclick)="$event.stopPropagation()">
-              <input type="checkbox"
-                class="w-4 h-4 rounded cursor-pointer bg-[var(--lt-checkbox-bg,white)] border border-[var(--lt-checkbox-border,theme(colors.slate.300))] focus:ring-2 focus:ring-offset-2 focus:ring-[var(--lt-icon-active,theme(colors.blue.600))] focus:ring-offset-[var(--lt-bg-primary,white)] accent-[var(--lt-icon-active,theme(colors.blue.600))]"
-                [checked]="!!getCell(item.originalModelIndex, c)?.value"
-                [disabled]="getCell(item.originalModelIndex, c)?.readOnly"
-                (change)="onCheckboxChange($event, item.originalModelIndex, c)" (mousedown)="$event.stopPropagation()">
-            </div>
-            } @else {
-            <div class="flex items-center w-full min-w-0 break-words">
-              @if (columnConfig()()[c]?.editor === 'dropdown') {
-              @if (getDropdownOptionColor(item.originalModelIndex, c); as color) {
-              <span class="h-2 w-2 rounded-full mr-2 flex-shrink-0" [style.backgroundColor]="color"></span>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of displayedRows(); track item.originalModelIndex; let r = $index) {
+          <tr class="long-spreadsheet-row">
+            <th [attr.data-row-index]="r" (contextmenu)="onRowContextMenu($event, r)"
+              class="sticky left-0 w-12 min-w-[3rem] border-r border-b font-semibold z-30 align-top cursor-pointer bg-[var(--lt-bg-header,theme(colors.slate.100))] border-b-[var(--lt-border-default,theme(colors.slate.200))] border-r-[var(--lt-border-default,theme(colors.slate.200))] text-[var(--lt-text-header,theme(colors.gray.600))] hover:bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] long-spreadsheet-row-header-cell"
+              style="padding: 7px 10px;">
+              {{ r + 1 }}
+            </th>
+            @for (cell of item.cells; track $index; let c = $index) {
+            <td [attr.data-row]="item.originalModelIndex" [attr.data-col]="c"
+              (dblclick)="onCellDoubleClick(item.originalModelIndex, c)"
+              (contextmenu)="onCellContextMenu($event, item.originalModelIndex, c)"
+              (mouseenter)="onCellMouseEnter($event, item.originalModelIndex, c)" (mouseleave)="onCellMouseLeave()"
+              style="padding: 7px 10px;"
+              class="border-r border-b relative whitespace-pre-wrap align-top long-spreadsheet-cell {{ isEditing(item.originalModelIndex,c) ? 'invisible' : '' }} {{ getCell(item.originalModelIndex, c)?.readOnly ? 'text-[var(--lt-text-read-only,theme(colors.gray.500))] bg-[var(--lt-bg-primary,transparent)]' : 'text-[var(--lt-text-primary,theme(colors.gray.900))]' }} {{ isCellInvalid(item.originalModelIndex, c) ? '!bg-[var(--lt-bg-invalid,theme(colors.red.100))]' : (isSelected(item.originalModelIndex,c) ? 'bg-[var(--lt-bg-selection,theme(colors.blue.100))]' : '') }} {{ isSelected(item.originalModelIndex,c) ? 'border-transparent' : 'border-[var(--lt-border-grid,theme(colors.slate.200))]' }}">
+              @if (isCellInvalid(item.originalModelIndex, c)) {
+              <div
+                class="absolute top-0 right-0 w-0 h-0 border-solid z-20 border-b-[4px] border-l-[4px] border-t-[4px] border-r-[4px] border-b-transparent border-l-transparent border-t-[#ff0000] border-r-[#ff0000]"
+                (mouseenter)="onCellMouseEnter($event, item.originalModelIndex, c)"></div>
               }
+              @if (columnConfig()()[c]?.editor === 'checkbox') {
+              <div class="flex items-center justify-center w-full h-full" (dblclick)="$event.stopPropagation()">
+                <input type="checkbox"
+                  class="w-4 h-4 rounded cursor-pointer bg-[var(--lt-checkbox-bg,white)] border border-[var(--lt-checkbox-border,theme(colors.slate.300))] focus:ring-2 focus:ring-offset-2 focus:ring-[var(--lt-icon-active,theme(colors.blue.600))] focus:ring-offset-[var(--lt-bg-primary,white)] accent-[var(--lt-icon-active,theme(colors.blue.600))]"
+                  [checked]="!!getCell(item.originalModelIndex, c)?.value"
+                  [disabled]="getCell(item.originalModelIndex, c)?.readOnly"
+                  (change)="onCheckboxChange($event, item.originalModelIndex, c)"
+                  (mousedown)="$event.stopPropagation()">
+              </div>
+              } @else {
+              <div class="flex items-center w-full min-w-0 break-words">
+                @if (columnConfig()()[c]?.editor === 'dropdown') {
+                @if (getDropdownOptionColor(item.originalModelIndex, c); as color) {
+                <span class="h-2 w-2 rounded-full mr-2 flex-shrink-0" [style.backgroundColor]="color"></span>
+                }
+                }
+                <span [innerHTML]="getHighlightedCellContent(item.originalModelIndex, c)"></span>
+              </div>
               }
-              <span [innerHTML]="getHighlightedCellContent(item.originalModelIndex, c)"></span>
-            </div>
+              @if (isFillHandleVisible(item.originalModelIndex, c)) {
+              <div
+                class="fill-handle absolute -right-1.5 -bottom-1.5 w-3 h-3 cursor-crosshair z-[70] bg-[var(--lt-fill-handle,theme(colors.blue.600))] border border-[var(--lt-fill-handle-border,white)]"
+                (dblclick)="onFillHandleDoubleClick($event)"></div>
+              }
+            </td>
             }
-            @if (isFillHandleVisible(item.originalModelIndex, c)) {
-            <div
-              class="fill-handle absolute -right-1.5 -bottom-1.5 w-3 h-3 cursor-crosshair z-[70] bg-[var(--lt-fill-handle,theme(colors.blue.600))] border border-[var(--lt-fill-handle-border,white)]"
-              (dblclick)="onFillHandleDoubleClick($event)"></div>
-            }
-          </td>
+          </tr>
           }
-        </tr>
-        }
-      </tbody>
-    </table>
+        </tbody>
+      </table>
 
-    <!-- Floating Cell Editor -->
-    @if (editingCell(); as coords) {
-    @if (editorPosition(); as pos) {
-    @if (getCell(coords.row, coords.col); as cell) {
-    @if (columnConfig()()[coords.col]?.editor === 'dropdown') {
-    <div #dropdownEditor (mousedown)="$event.stopPropagation()"
-      class="absolute z-[70] flex flex-col rounded-md shadow-lg border-2 border-[var(--lt-border-editing,theme(colors.blue.600))] long-spreadsheet-floating-editor"
-      [style.top.px]="pos.top" [style.left.px]="pos.left" [style.width.px]="pos.width"
-      [style.background]="'var(--lt-popup-bg)'">
-      <div class="p-2 border-b border-[var(--lt-border-default,theme(colors.slate.200))]">
-        <input type="text" #dropdownSearchInput [ngModel]="dropdownSearchText()"
-          (ngModelChange)="dropdownSearchText.set($event)" (keydown)="onDropdownKeyDown($event)"
-          placeholder="Filter options..."
-          class="w-full px-2 py-1 bg-[var(--lt-input-bg,white)] border border-[var(--lt-border-default,theme(colors.slate.300))] rounded-md shadow-sm focus:outline-none focus:border-[var(--lt-border-editing,theme(colors.blue.500))] focus:ring-1 focus:ring-[var(--lt-border-editing,theme(colors.blue.500))] text-[var(--lt-text-primary,inherit)]"
-          [style.fontSize]="'var(--lt-font-input, 14px)'">
+      <!-- Floating Cell Editor -->
+      @if (editingCell(); as coords) {
+      @if (editorPosition(); as pos) {
+      @if (getCell(coords.row, coords.col); as cell) {
+      @if (columnConfig()()[coords.col]?.editor === 'dropdown') {
+      <div #dropdownEditor (mousedown)="$event.stopPropagation()"
+        class="absolute z-[70] flex flex-col rounded-md shadow-lg border-2 border-[var(--lt-border-editing,theme(colors.blue.600))] long-spreadsheet-floating-editor"
+        [style.top.px]="pos.top" [style.left.px]="pos.left" [style.width.px]="pos.width"
+        [style.background]="'var(--lt-popup-bg)'">
+        <div class="p-2 border-b border-[var(--lt-border-default,theme(colors.slate.200))]">
+          <input type="text" #dropdownSearchInput [ngModel]="dropdownSearchText()"
+            (ngModelChange)="dropdownSearchText.set($event)" (keydown)="onDropdownKeyDown($event)"
+            placeholder="Filter options..."
+            class="w-full px-2 py-1 bg-[var(--lt-input-bg,white)] border border-[var(--lt-border-default,theme(colors.slate.300))] rounded-md shadow-sm focus:outline-none focus:border-[var(--lt-border-editing,theme(colors.blue.500))] focus:ring-1 focus:ring-[var(--lt-border-editing,theme(colors.blue.500))] text-[var(--lt-text-primary,inherit)]"
+            [style.fontSize]="'var(--lt-font-input, 14px)'">
+        </div>
+        <div class="flex-grow overflow-y-auto max-h-48 p-1 modal-scroll-content">
+          @for (option of filteredDropdownOptions(); track option; let i = $index) {
+          <button (click)="selectDropdownOption(option)" [id]="'dropdown-option-' + i"
+            [style.fontSize]="'var(--lt-font-table-cell, 12px)'"
+            [style.font-family]="'var(--lt-font-family-mono, monospace)'"
+            [class]="'w-full text-left px-2 py-1.5 leading-[12px] flex items-center justify-between rounded-md ' + (getOptionValue(option) == cell.value ? 'bg-[var(--lt-bg-selection,theme(colors.blue.100))] text-[var(--lt-text-selection,theme(colors.blue.800))] font-semibold' : (i === dropdownActiveOptionIndex() ? 'bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] text-[var(--lt-text-primary,theme(colors.gray.800))]' : 'text-[var(--lt-text-primary,theme(colors.gray.700))] hover:bg-[var(--lt-icon-hover-bg,theme(colors.gray.100))]'))">
+            <div class="flex items-center truncate">
+              @if (getOptionColor(option); as color) { <span class="h-2 w-2 rounded-full mr-2 flex-shrink-0"
+                [style.backgroundColor]="color"></span> }
+              <span class="truncate">{{ getOptionValue(option) }}</span>
+            </div>
+            @if (getOptionValue(option) == cell.value) { <i class="pi pi-check text-xs ml-2 flex-shrink-0"></i> }
+          </button>
+          }
+        </div>
+        <div class="p-1">
+          <button (click)="editDropdownOptions()"
+            class="w-full text-left px-2 py-1.5 text-sm text-[var(--lt-icon-active,theme(colors.blue.600))] hover:bg-[var(--lt-icon-hover-bg,theme(colors.gray.100))] flex items-center gap-2 rounded-md"
+            [style.fontSize]="'var(--lt-font-modal-content, 14px)'">
+            <i class="pi pi-pencil text-xs"></i><span>Edit Options</span>
+          </button>
+        </div>
       </div>
-      <div class="flex-grow overflow-y-auto max-h-48 p-1 modal-scroll-content">
-        @for (option of filteredDropdownOptions(); track option; let i = $index) {
-        <button (click)="selectDropdownOption(option)" [id]="'dropdown-option-' + i"
-          [style.fontSize]="'var(--lt-font-table-cell, 12px)'"
+      } @else {
+      <div
+        class="absolute z-[70] box-border border-2 bg-[var(--lt-input-bg,white)] border-[var(--lt-border-editing,theme(colors.blue.600))] long-spreadsheet-floating-editor"
+        [style.top.px]="pos.top" [style.left.px]="pos.left" [style.width.px]="pos.width" [style.height.px]="pos.height"
+        [style.padding]="'7px 10px'">
+        <textarea #editingInput [(ngModel)]="editValue" (blur)="onEditBlur()" (keydown)="onEditKeyDown($event)"
+          (input)="onEditorInput()"
+          class="w-full h-full block bg-transparent select-text resize-none outline-none box-border !p-0 !border-0 leading-[12px] text-[var(--lt-text-primary,inherit)]"
           [style.font-family]="'var(--lt-font-family-mono, monospace)'"
-          [class]="'w-full text-left px-2 py-1.5 leading-[12px] flex items-center justify-between rounded-md ' + (getOptionValue(option) == cell.value ? 'bg-[var(--lt-bg-selection,theme(colors.blue.100))] text-[var(--lt-text-selection,theme(colors.blue.800))] font-semibold' : (i === dropdownActiveOptionIndex() ? 'bg-[var(--lt-bg-header-hover,theme(colors.slate.200))] text-[var(--lt-text-primary,theme(colors.gray.800))]' : 'text-[var(--lt-text-primary,theme(colors.gray.700))] hover:bg-[var(--lt-icon-hover-bg,theme(colors.gray.100))]'))">
-          <div class="flex items-center truncate">
-            @if (getOptionColor(option); as color) { <span class="h-2 w-2 rounded-full mr-2 flex-shrink-0"
-              [style.backgroundColor]="color"></span> }
-            <span class="truncate">{{ getOptionValue(option) }}</span>
-          </div>
-          @if (getOptionValue(option) == cell.value) { <i class="pi pi-check text-xs ml-2 flex-shrink-0"></i> }
-        </button>
+          [style.fontSize]="'var(--lt-font-table-cell, 12px)'"></textarea>
+      </div>
+      }
+      }
+      }
+      }
+
+      <!-- Selection and Fill Overlays -->
+      @for (pos of selectionRangePositions(); track $index) {
+      <div
+        class="absolute pointer-events-none z-20 shadow-[inset_0_0_0_2px] shadow-[var(--lt-selection-shadow,theme(colors.blue.600))]"
+        [style]="pos"></div>
+      }
+      @if (fillRange() && selectionRanges().length > 0) {
+      <div
+        class="absolute pointer-events-none z-10 border border-dashed border-gray-600 bg-gray-400/10 dark:border-slate-400 dark:bg-slate-500/20"
+        [style]="fillRangePosition()"></div>
+      }
+      @if (isDraggingColumn()) {
+      <div class="absolute w-0.5 z-[60] pointer-events-none bg-[var(--lt-drop-indicator,theme(colors.blue.500))]"
+        [style]="dropIndicatorPosition()"></div>
+      }
+
+      <div #filterPopupEl class="long-spreadsheet-filter-popup-container">
+        @if (activeFilterPopup(); as popup) {
+        <long-filter-popup [isVisible]="!!popup" [position]="filterPopupPosition()"
+          [uniqueValues]="currentFilterUniqueValues()" [initialSelection]="filterPopupInitialSelection()"
+          (apply)="handleApplyFilter({ col: popup.col, selection: $event })" (clear)="handleClearFilter(popup.col)"
+          (close)="activeFilterPopup.set(null)"></long-filter-popup>
         }
       </div>
-      <div class="p-1">
-        <button (click)="editDropdownOptions()"
-          class="w-full text-left px-2 py-1.5 text-sm text-[var(--lt-icon-active,theme(colors.blue.600))] hover:bg-[var(--lt-icon-hover-bg,theme(colors.gray.100))] flex items-center gap-2 rounded-md"
-          [style.fontSize]="'var(--lt-font-modal-content, 14px)'">
-          <i class="pi pi-pencil text-xs"></i><span>Edit Options</span>
-        </button>
+
+      <long-find-replace #findReplacePanelEl [isVisible]="isFindReplaceVisible()" [container]="spreadsheetContainer"
+        class="longtable-scope" [resultsCount]="findResults().length" [currentIndex]="currentFindIndex()"
+        [theme]="theme()" (findQueryChange)="onFindQueryChange($event)"
+        (findOptionsChange)="onFindOptionsChange($event)" (navigateNext)="navigateToNextMatch()"
+        (navigatePrev)="navigateToPrevMatch()" (replaceOne)="replaceCurrentMatch($event)"
+        (replaceAll)="replaceAllMatches($event)" (close)="closeFindReplace()"></long-find-replace>
+
+      <long-column-editor [isVisible]="isColumnSettingsVisible()" [columnIndex]="columnSettingsColIndex()"
+        [allRows]="rows()" [columnConfig]="columnConfig()" (close)="isColumnSettingsVisible.set(false)"
+        (save)="handleSaveColumnSettings($event)"></long-column-editor>
+
+      <long-table-stats [isVisible]="isStatsModalVisible()" [rows]="displayedRows()" [columnConfig]="columnConfig()()"
+        (close)="isStatsModalVisible.set(false)" [useCountColumn]="statsUseCountColumn" [graphs]="statsGraphsConfig()"
+        [theme]="theme()">
+      </long-table-stats>
+
+      <!-- Validation Tooltip -->
+      @if (isTooltipVisible()) {
+      @let pos = tooltipPosition();
+      <div #validationTooltip
+        class="absolute w-max max-w-xs bg-red-600 text-white text-sm rounded-md shadow-lg p-2 z-[110] pointer-events-none leading-tight"
+        [style.font-family]="'var(--lt-font-family-mono, monospace)'" [style.left.px]="pos.x" [style.top.px]="pos.y">
+        {{ tooltipText() }}
       </div>
-    </div>
-    } @else {
-    <div
-      class="absolute z-[70] box-border border-2 bg-[var(--lt-input-bg,white)] border-[var(--lt-border-editing,theme(colors.blue.600))] long-spreadsheet-floating-editor"
-      [style.top.px]="pos.top" [style.left.px]="pos.left" [style.width.px]="pos.width" [style.height.px]="pos.height"
-      [style.padding]="'7px 10px'">
-      <textarea #editingInput [(ngModel)]="editValue" (blur)="onEditBlur()" (keydown)="onEditKeyDown($event)"
-        (input)="onEditorInput()"
-        class="w-full h-full block bg-transparent select-text resize-none outline-none box-border !p-0 !border-0 leading-[12px] text-[var(--lt-text-primary,inherit)]"
-        [style.font-family]="'var(--lt-font-family-mono, monospace)'"
-        [style.fontSize]="'var(--lt-font-table-cell, 12px)'"></textarea>
-    </div>
-    }
-    }
-    }
-    }
-
-    <!-- Selection and Fill Overlays -->
-    @for (pos of selectionRangePositions(); track $index) {
-    <div
-      class="absolute pointer-events-none z-20 shadow-[inset_0_0_0_2px] shadow-[var(--lt-selection-shadow,theme(colors.blue.600))]"
-      [style]="pos"></div>
-    }
-    @if (fillRange() && selectionRanges().length > 0) {
-    <div
-      class="absolute pointer-events-none z-10 border border-dashed border-gray-600 bg-gray-400/10 dark:border-slate-400 dark:bg-slate-500/20"
-      [style]="fillRangePosition()"></div>
-    }
-    @if (isDraggingColumn()) {
-    <div class="absolute w-0.5 z-[60] pointer-events-none bg-[var(--lt-drop-indicator,theme(colors.blue.500))]"
-      [style]="dropIndicatorPosition()"></div>
-    }
-
-    <div #filterPopupEl class="long-spreadsheet-filter-popup-container">
-      @if (activeFilterPopup(); as popup) {
-      <long-filter-popup [isVisible]="!!popup" [position]="filterPopupPosition()"
-        [uniqueValues]="currentFilterUniqueValues()" [initialSelection]="filterPopupInitialSelection()"
-        (apply)="handleApplyFilter({ col: popup.col, selection: $event })" (clear)="handleClearFilter(popup.col)"
-        (close)="activeFilterPopup.set(null)"></long-filter-popup>
       }
     </div>
 
-    <long-find-replace #findReplacePanelEl [isVisible]="isFindReplaceVisible()" [container]="spreadsheetContainer"
-      [resultsCount]="findResults().length" [currentIndex]="currentFindIndex()" [theme]="theme()"
-      (findQueryChange)="onFindQueryChange($event)" (findOptionsChange)="onFindOptionsChange($event)"
-      (navigateNext)="navigateToNextMatch()" (navigatePrev)="navigateToPrevMatch()"
-      (replaceOne)="replaceCurrentMatch($event)" (replaceAll)="replaceAllMatches($event)"
-      (close)="closeFindReplace()"></long-find-replace>
+    <!-- Popups and Modals -->
+    <long-context-menu #contextMenuEl [isVisible]="isContextMenuVisible()" [position]="contextMenuPosition()"
+      class="long-spreadsheet-context-menu longtable-scope" [type]="contextMenuType()" [data]="contextMenuData()"
+      (menuAction)="handleContextMenuAction($event)" [appendTo]="'body'" [theme]="theme()"></long-context-menu>
 
-    <long-column-editor [isVisible]="isColumnSettingsVisible()" [columnIndex]="columnSettingsColIndex()"
-      [allRows]="rows()" [columnConfig]="columnConfig()" (close)="isColumnSettingsVisible.set(false)"
-      (save)="handleSaveColumnSettings($event)"></long-column-editor>
-
-    <long-table-stats [isVisible]="isStatsModalVisible()" [rows]="displayedRows()" [columnConfig]="columnConfig()()"
-      (close)="isStatsModalVisible.set(false)" [useCountColumn]="statsUseCountColumn" [graphs]="statsGraphsConfig()"
-      [theme]="theme()">
-    </long-table-stats>
-
-    <!-- Validation Tooltip -->
-    @if (isTooltipVisible()) {
-    @let pos = tooltipPosition();
-    <div #validationTooltip
-      class="absolute w-max max-w-xs bg-red-600 text-white text-sm rounded-md shadow-lg p-2 z-[110] pointer-events-none leading-tight"
+    <!-- Header Tooltip -->
+    @if (isHeaderTooltipVisible() && headerTooltipContent(); as content) {
+    @let pos = headerTooltipPosition();
+    <div #headerTooltip
+      class="absolute w-max max-w-xs text-sm rounded-md shadow-lg p-2.5 z-[110] pointer-events-none leading-tight"
+      [style.background-color]="'var(--lt-tooltip-bg, #1e293b)'" [style.color]="'var(--lt-tooltip-text, #ffffff)'"
       [style.font-family]="'var(--lt-font-family-mono, monospace)'" [style.left.px]="pos.x" [style.top.px]="pos.y">
-      {{ tooltipText() }}
+      <div class="font-bold mb-1">{{ content.name }}</div>
+      @if (content.description) {
+      <div class="mb-1 text-slate-300 italic">{{ content.description }}</div>
+      }
+      <div class="border-t border-slate-600 my-1"></div>
+      <div class="text-slate-400">Field: <span class="font-semibold text-slate-200">{{ content.kebabName }}</span></div>
+      <div class="text-slate-400">Type: <span class="font-semibold text-slate-200">{{ content.type }}</span></div>
     </div>
     }
   </div>
-
-  <!-- Popups and Modals -->
-  <long-context-menu #contextMenuEl [isVisible]="isContextMenuVisible()" [position]="contextMenuPosition()"
-    class="long-spreadsheet-context-menu" [type]="contextMenuType()" [data]="contextMenuData()"
-    (menuAction)="handleContextMenuAction($event)" [appendTo]="'body'" [theme]="theme()"></long-context-menu>
-
-  <!-- Header Tooltip -->
-  @if (isHeaderTooltipVisible() && headerTooltipContent(); as content) {
-  @let pos = headerTooltipPosition();
-  <div #headerTooltip
-    class="absolute w-max max-w-xs text-sm rounded-md shadow-lg p-2.5 z-[110] pointer-events-none leading-tight"
-    [style.background-color]="'var(--lt-tooltip-bg, #1e293b)'" [style.color]="'var(--lt-tooltip-text, #ffffff)'"
-    [style.font-family]="'var(--lt-font-family-mono, monospace)'" [style.left.px]="pos.x" [style.top.px]="pos.y">
-    <div class="font-bold mb-1">{{ content.name }}</div>
-    @if (content.description) {
-    <div class="mb-1 text-slate-300 italic">{{ content.description }}</div>
-    }
-    <div class="border-t border-slate-600 my-1"></div>
-    <div class="text-slate-400">Field: <span class="font-semibold text-slate-200">{{ content.kebabName }}</span></div>
-    <div class="text-slate-400">Type: <span class="font-semibold text-slate-200">{{ content.type }}</span></div>
-  </div>
-  }
 </div>

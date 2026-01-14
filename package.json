@@ -15,7 +15,7 @@
     "dev": "vite -c docs/vite.config.ts",
     "build:demo": "vite build -c docs/vite.config.ts",
     "preview": "vite preview -c docs/vite.config.ts",
-    "build:lib": "ng-packagr -p longtable/ng-package.json -c longtable/tsconfig.lib.json && npx tailwindcss -i longtable/src/styles.css -o dist/longtable/prebuilt-styles.css --minify && mkdir -p dist/longtable/fonts && cp node_modules/primeicons/fonts/* dist/longtable/fonts/ && cd dist/longtable && npm pack"
+    "build:lib": "ng-packagr -p longtable/ng-package.json -c longtable/tsconfig.lib.json && npx tailwindcss -c longtable/tailwind.config.lib.js -i longtable/src/styles.css -o dist/longtable/longtable-styles.css --minify && mkdir -p dist/longtable/fonts && cp node_modules/primeicons/fonts/* dist/longtable/fonts/ && cd dist/longtable && npm pack"
   },
   "dependencies": {
     "@angular/common": "^21.0.0",

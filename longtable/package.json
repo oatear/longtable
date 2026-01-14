@@ -1,7 +1,7 @@
 {
   "name": "oatear-longtable",
-  "version": "0.1.4",
-  "style": "./prebuilt-styles.css",
+  "version": "0.1.5",
+  "style": "./longtable-styles.css",
   "description": "A feature-rich spreadsheet component built for Angular.",
   "repository": "https://github.com/oatear/longtable",
   "author": {

@@ -1,4 +1,5 @@
 @import 'primeicons/primeicons.css';
-@tailwind base;
+@import './scoped-preflight.css';
+
 @tailwind components;
 @tailwind utilities;

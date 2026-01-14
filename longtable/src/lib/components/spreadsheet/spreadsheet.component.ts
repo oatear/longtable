@@ -1133,7 +1133,7 @@ export class SpreadsheetComponent implements OnDestroy {
       const type = config?.editor ?? 'text';
       this.headerTooltipContent.set({ name: config.name, description: config?.description, type: type.charAt(0).toUpperCase() + type.slice(1), kebabName: config.field });
       const rootRect = this.rootContainer().nativeElement.getBoundingClientRect();
-      const targetRect = (event.target as HTMLElement).getBoundingClientRect();
+      const targetRect = this.lastHeaderHoverTarget!.getBoundingClientRect();
       this.headerTooltipPosition.set({ x: targetRect.left - rootRect.left, y: targetRect.top - rootRect.top + targetRect.height + 2 });
       this.isHeaderTooltipVisible.set(true);
     }, 700);
