@@ -45,4 +45,4 @@ interface DropdownOption {
 - **`description`**: An optional description for the column, visible on hover.
 - **`editor`**: Specifies the type of editor to use for all cells in the column. Defaults to `'text'`.
 - **`options`**: An array of options for the `'dropdown'` editor. Can be simple strings or `DropdownOption` objects for colored labels.
-- **`lockSettings`**: If `true`, the column settings (name, description, type, options) cannot be edited via the column settings dialog. The column width can still be changed.
+- **`lockSettings`**: If `true`, the column settings (name, description, type, options) cannot be edited via the column settings dialog. The column width can still be changed. The column cannot be deleted.

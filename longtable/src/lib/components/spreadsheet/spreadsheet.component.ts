@@ -424,7 +424,7 @@ export class SpreadsheetComponent implements OnDestroy {
       const config = this.columnConfig()();
       isDeleteReadOnly = false;
       for (let c = norm.start.col; c <= norm.end.col; c++) {
-        if (config[c]?.readOnly) {
+        if (config[c]?.readOnly || config[c]?.lockSettings) {
           isDeleteReadOnly = true;
           break;
         }
@@ -1404,34 +1404,43 @@ export class SpreadsheetComponent implements OnDestroy {
       const newOptions = formState.type === 'dropdown' ? formState.options.map(opt => ({ value: opt.value.trim(), color: opt.color })).filter(opt => opt.value) : undefined;
       const newEditor = formState.type === 'text' ? undefined : formState.type;
 
-      newConfigs[colIndex] = {
-        ...oldConfig,
-        name: formState.name,
-        field: this._toKebabCase(formState.name),
-        description: formState.description || undefined,
-        width: formState.widthValue ?? 135,
-        editor: newEditor,
-        options: newOptions,
-      };
+      if (oldConfig.lockSettings) {
+        newConfigs[colIndex] = {
+          ...oldConfig,
+          width: formState.widthValue ?? 135,
+        };
+      } else {
+        newConfigs[colIndex] = {
+          ...oldConfig,
+          name: formState.name,
+          field: this._toKebabCase(formState.name),
+          description: formState.description || undefined,
+          width: formState.widthValue ?? 135,
+          editor: newEditor,
+          options: newOptions,
+        };
+      }
 
       return newConfigs;
     });
 
-    this.data().update(grid => {
-      const newGrid = grid.map(r => [...r]);
-      for (let r = 0; r < newGrid.length; r++) {
-        const oldCell = newGrid[r][colIndex];
-        if (!oldCell) continue;
-        let newValue = oldCell.value;
-        if (formState.type === 'numeric') newValue = (typeof oldCell.value === 'string' && oldCell.value.trim() !== '') ? parseFloat(oldCell.value) : (typeof oldCell.value === 'boolean' ? (oldCell.value ? 1 : 0) : newValue);
-        else if (formState.type === 'checkbox') newValue = ['true', '1'].includes(String(oldCell.value).toLowerCase().trim());
-        else newValue = String(oldCell.value);
+    if (!this.columnConfig()()[colIndex]?.lockSettings) {
+      this.data().update(grid => {
+        const newGrid = grid.map(r => [...r]);
+        for (let r = 0; r < newGrid.length; r++) {
+          const oldCell = newGrid[r][colIndex];
+          if (!oldCell) continue;
+          let newValue = oldCell.value;
+          if (formState.type === 'numeric') newValue = (typeof oldCell.value === 'string' && oldCell.value.trim() !== '') ? parseFloat(oldCell.value) : (typeof oldCell.value === 'boolean' ? (oldCell.value ? 1 : 0) : newValue);
+          else if (formState.type === 'checkbox') newValue = ['true', '1'].includes(String(oldCell.value).toLowerCase().trim());
+          else newValue = String(oldCell.value);
 
-        const newCell: Cell = { ...oldCell, value: newValue };
-        newGrid[r][colIndex] = newCell;
-      }
-      return newGrid;
-    });
+          const newCell: Cell = { ...oldCell, value: newValue };
+          newGrid[r][colIndex] = newCell;
+        }
+        return newGrid;
+      });
+    }
     this.isColumnSettingsVisible.set(false);
   }
 
@@ -1627,6 +1636,12 @@ export class SpreadsheetComponent implements OnDestroy {
     this.recordHistory();
     const { start, end } = this.normalizeRange(selection);
     const count = end.col - start.col + 1;
+
+    // Check for locked/read-only columns
+    const config = this.columnConfig()();
+    for (let c = start.col; c <= end.col; c++) {
+      if (config[c]?.readOnly || config[c]?.lockSettings) return;
+    }
     this.data().update(grid => grid.map(row => { const newRow = [...row]; newRow.splice(start.col, count); return newRow; }));
     this.columnConfig().update(c => { const newC = [...c]; newC.splice(start.col, count); return newC; });
     this.activeCell.set(null);

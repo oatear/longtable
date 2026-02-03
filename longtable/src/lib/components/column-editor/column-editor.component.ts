@@ -118,10 +118,16 @@ export class ColumnEditorComponent {
       ? Math.max(60, Number(formState.widthValue))
       : 135;
 
-    if (formState.description) {
-      newConfig.description = formState.description;
-    } else {
-      delete newConfig.description;
+    if (!this.isLocked()) {
+      newConfig.name = formState.name;
+      newConfig.editor = formState.type;
+      newConfig.options = formState.options;
+
+      if (formState.description) {
+        newConfig.description = formState.description;
+      } else {
+        delete newConfig.description;
+      }
     }
 
     this.save.emit({ colIndex, config: newConfig, formState });
