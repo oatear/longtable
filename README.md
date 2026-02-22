@@ -91,41 +91,9 @@ Use this if you are actively modifying the library and want changes to reflect i
  
  After installing the library, you need to configure your project to support the library's styling and icons.
  
- ### 1. Install Dependencies
+ ### Import Styles
  
- Ensure you have Tailwind CSS and PrimeIcons installed:
- 
- ```bash
- npm install tailwindcss primeicons
- ```
- 
- ### 2. Configure Tailwind CSS
- 
- Update your `tailwind.config.js` to include the library's files in the `content` array. This ensures that the Tailwind utility classes used by the library are generated.
- 
- ```javascript
- /** @type {import('tailwindcss').Config} */
- module.exports = {
-   content: [
-     "./src/**/*.{html,ts}",
-     "./node_modules/oatear-longtable/**/*.{html,ts,mjs}" // Add this line
-   ],
-   theme: {
-     extend: {},
-   },
-   plugins: [],
- }
- ```
- 
- ### 3. Import Styles
- 
- You have two options for importing styles:
- 
- **Option A: Use Prebuilt Styles (Recommended)**
- 
- Import the prebuilt CSS file which includes all necessary Tailwind utilities and PrimeIcons. This is the easiest way to get started.
- 
- Add it to your global stylesheet (e.g., `src/styles.css` or `src/styles.scss`):
+ Add the prebuilt styles to your global stylesheet (e.g., `src/styles.css` or `src/styles.scss`):
  
  ```css
  @import 'oatear-longtable/longtable-styles.css';
@@ -139,29 +107,6 @@ Use this if you are actively modifying the library and want changes to reflect i
    "node_modules/oatear-longtable/longtable-styles.css"
  ]
  ```
- 
- **Option B: Manual Configuration**
- 
- If you prefer to integrate the library's styles into your own Tailwind build (e.g., for customization), use the following setup:
- 
- 1.  **Configure Tailwind**: Update `tailwind.config.js` to include the library's files:
-     ```javascript
-     module.exports = {
-       content: [
-         "./src/**/*.{html,ts}",
-         "./node_modules/oatear-longtable/**/*.{html,ts,mjs}"
-       ],
-       // ...
-     }
-     ```
- 
- 2.  **Import Directives**: In your global styles file:
-     ```css
-     @import 'primeicons/primeicons.css';
-     @tailwind base;
-     @tailwind components;
-     @tailwind utilities;
-     ```
  
  ## Basic Usage
 
