@@ -284,6 +284,21 @@ npm run build:demo
 ```
 Artifacts will be generated in `dist/docs`.
 
+## Releasing
+
+To publish a new release using the automated GitHub Actions workflow:
+
+1. Update the version number in `longtable/package.json` and commit the change.
+2. Create and push a new git tag that matches your version (starting with `v`, e.g., `v1.0.0`):
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+The "Release Library" GitHub Actions workflow will automatically trigger. It will check out the codebase, build the library, and create a new GitHub release containing the `oatear-longtable-1.0.0.tgz` asset.
+
+Alternatively, you can manually trigger the "Release Library" workflow from the Actions tab in GitHub.
+
 <!-- BADGE & IMAGE DEFINITIONS -->
 [last-commit]: https://img.shields.io/github/last-commit/oatear/longtable
 [license]: https://badgen.net/github/license/oatear/longtable?cache=600
