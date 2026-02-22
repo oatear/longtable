@@ -125,8 +125,19 @@ Use this if you are actively modifying the library and want changes to reflect i
  
  Import the prebuilt CSS file which includes all necessary Tailwind utilities and PrimeIcons. This is the easiest way to get started.
  
+ Add it to your global stylesheet (e.g., `src/styles.css` or `src/styles.scss`):
+ 
  ```css
- @import 'oatear-longtable/prebuilt-styles.css';
+ @import 'oatear-longtable/longtable-styles.css';
+ ```
+
+ Alternatively, include it directly in your `angular.json` build configuration under the `styles` array:
+
+ ```json
+ "styles": [
+   "src/styles.css",
+   "node_modules/oatear-longtable/longtable-styles.css"
+ ]
  ```
  
  **Option B: Manual Configuration**
