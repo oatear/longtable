@@ -1952,9 +1952,202 @@ export class SpreadsheetComponent implements OnDestroy {
     }
   }
 
-  private clearSelectedCells() { if (this.selectionRanges().length === 0) return; this.recordHistory(); this.data().update(grid => { const newGrid = grid.map(r => [...r]); this.selectionRanges().forEach(range => { const norm = this.normalizeRange(range); for (let r = norm.start.row; r <= norm.end.row; r++) for (let c = norm.start.col; c <= norm.end.col; c++) { const model = this.visualToModelCoords({ row: r, col: c }); const colConfig = this.columnConfig()()[c]; if (model && newGrid[model.row][model.col] && !newGrid[model.row][model.col].readOnly) newGrid[model.row][model.col] = { ...newGrid[model.row][model.col], value: colConfig?.editor === 'checkbox' ? false : '' }; } }); return newGrid; }); }
-  private applyFill(fill: { start: Coordinates; end: Coordinates } | null) { const sel = this.activeSelectionRange(); if (!fill || !sel) return; this.recordHistory(); const normSel = this.normalizeRange(sel), normFill = this.normalizeRange(fill); this.data().update(grid => { const newGrid = grid.map(r => [...r]); const sRows = normSel.end.row - normSel.start.row + 1, sCols = normSel.end.col - normSel.start.col + 1; for (let r = normSel.start.row; r <= normFill.end.row; r++) for (let c = normSel.start.col; c <= normFill.end.col; c++) if (r > normSel.end.row || c > normSel.end.col) { const sVisRow = normSel.start.row + ((r - normSel.start.row) % sRows), sVisCol = normSel.start.col + ((c - normSel.start.col) % sCols); const sMod = this.visualToModelCoords({ row: sVisRow, col: sVisCol }), tMod = this.visualToModelCoords({ row: r, col: c }); if (sMod && tMod && newGrid[tMod.row]?.[c] && !newGrid[tMod.row][c].readOnly) newGrid[tMod.row][c] = { ...newGrid[tMod.row][c], value: grid[sMod.row][sMod.col].value }; } return newGrid; }); this.selectionRanges.set([fill]); }
-  private _performIntelligentReplace(pastedGrid: string[][]) { /* ... complex logic ... */ }
-  private _inferColumnType = (data: string[][], col: number): any => 'text';
+  private clearSelectedCells() {
+    if (this.selectionRanges().length === 0) return;
+    this.recordHistory();
+    this.data().update(grid => {
+      const newGrid = grid.map(r => [...r]);
+      this.selectionRanges().forEach(range => {
+        const norm = this.normalizeRange(range);
+        for (let r = norm.start.row; r <= norm.end.row; r++) {
+          for (let c = norm.start.col; c <= norm.end.col; c++) {
+            const model = this.visualToModelCoords({ row: r, col: c });
+            const colConfig = this.columnConfig()()[c];
+            if (model && newGrid[model.row][model.col] && !newGrid[model.row][model.col].readOnly) {
+              newGrid[model.row][model.col] = {
+                ...newGrid[model.row][model.col],
+                value: colConfig?.editor === 'checkbox' ? false : ''
+              };
+            }
+          }
+        }
+      });
+      return newGrid;
+    });
+  }
+
+  private applyFill(fill: { start: Coordinates; end: Coordinates } | null) {
+    const sel = this.activeSelectionRange();
+    if (!fill || !sel) return;
+    this.recordHistory();
+    const normSel = this.normalizeRange(sel);
+    const normFill = this.normalizeRange(fill);
+    this.data().update(grid => {
+      const newGrid = grid.map(r => [...r]);
+      const sRows = normSel.end.row - normSel.start.row + 1;
+      const sCols = normSel.end.col - normSel.start.col + 1;
+      for (let r = normSel.start.row; r <= normFill.end.row; r++) {
+        for (let c = normSel.start.col; c <= normFill.end.col; c++) {
+          if (r > normSel.end.row || c > normSel.end.col) {
+            const sVisRow = normSel.start.row + ((r - normSel.start.row) % sRows);
+            const sVisCol = normSel.start.col + ((c - normSel.start.col) % sCols);
+            const sMod = this.visualToModelCoords({ row: sVisRow, col: sVisCol });
+            const tMod = this.visualToModelCoords({ row: r, col: c });
+            if (sMod && tMod && newGrid[tMod.row]?.[c] && !newGrid[tMod.row][c].readOnly) {
+              newGrid[tMod.row][c] = {
+                ...newGrid[tMod.row][c],
+                value: grid[sMod.row][sMod.col].value
+              };
+            }
+          }
+        }
+      }
+      return newGrid;
+    });
+    this.selectionRanges.set([fill]);
+  }
+
+  private _performIntelligentReplace(pastedGrid: string[][]) {
+    if (!pastedGrid || pastedGrid.length <= 1) return;
+
+    this.recordHistory();
+
+    const headers = pastedGrid[0];
+    const dataRows = pastedGrid.slice(1);
+
+    const currentConfig = this.columnConfig()();
+    const newConfig: ColumnConfig[] = [];
+    const protectedColumns: ColumnConfig[] = [];
+
+    const usedNames = new Set(currentConfig.map(c => c.name));
+
+    // Helper to generate a unique name
+    const getUniqueNewName = () => {
+      for (let i = 0; i < 26; i++) {
+        const name = `Attribute ${String.fromCharCode(65 + i)}`;
+        if (!usedNames.has(name)) {
+          usedNames.add(name);
+          return name;
+        }
+      }
+      let i = 1;
+      while (usedNames.has(`Attribute ${i}`)) i++;
+      const name = `Attribute ${i}`;
+      usedNames.add(name);
+      return name;
+    };
+
+    // 1. Process incoming headers to build new config
+    headers.forEach((headerName, incomingColIndex) => {
+      const trimmedHeader = headerName.trim();
+      const existingCol = currentConfig.find(c => c.name.trim() === trimmedHeader);
+
+      if (existingCol) {
+        newConfig.push(existingCol);
+        usedNames.add(existingCol.name);
+      } else {
+        const inferredType = this._inferColumnType(dataRows, incomingColIndex);
+        let newName = trimmedHeader;
+        if (!newName) {
+          newName = getUniqueNewName();
+        } else if (usedNames.has(newName)) {
+          // resolve name collision by appending a number if user provides duplicate columns
+          let dupIndex = 1;
+          while (usedNames.has(`${newName} (${dupIndex})`)) dupIndex++;
+          newName = `${newName} (${dupIndex})`;
+        }
+
+        usedNames.add(newName);
+
+        newConfig.push({
+          name: newName,
+          field: this._toKebabCase(newName),
+          editor: inferredType !== 'text' ? inferredType : undefined
+        });
+      }
+    });
+
+    // 2. Add remaining protected columns that weren't in pasted data
+    currentConfig.forEach(col => {
+      const isInNewConfig = newConfig.some(c => c.name === col.name);
+      if (!isInNewConfig && (col.lockSettings || col.readOnly)) {
+        protectedColumns.push(col);
+      }
+    });
+
+    const finalConfig = [...newConfig, ...protectedColumns];
+
+    // 3. Build new data grid
+    const newGrid: Cell[][] = [];
+
+    dataRows.forEach((row, rowIndex) => {
+      const newCellRow: Cell[] = [];
+
+      // Fill pasted columns
+      newConfig.forEach((colConfig, configIndex) => {
+        const stringValue = row[configIndex] ?? '';
+        let existingOriginalCell: Cell | undefined;
+
+        const existingColIndex = currentConfig.findIndex(c => c.name === colConfig.name);
+        if (existingColIndex !== -1 && rowIndex < this.data()().length) {
+          existingOriginalCell = this.data()()[rowIndex][existingColIndex];
+        }
+
+        const value = this._convertPastedValue(stringValue, colConfig);
+        const cell: Cell = existingOriginalCell ? { ...existingOriginalCell, value } : { value };
+        newCellRow.push(cell);
+      });
+
+      // Fill protected columns
+      protectedColumns.forEach(colConfig => {
+        const existingColIndex = currentConfig.findIndex(c => c.name === colConfig.name);
+        if (existingColIndex !== -1 && rowIndex < this.data()().length) {
+          const existingCell = this.data()()[rowIndex][existingColIndex];
+          newCellRow.push({ ...existingCell });
+        } else {
+          let value: any = '';
+          if (colConfig.editor === 'checkbox') value = false;
+          else if (colConfig.editor === 'dropdown') value = this.getOptionValue(colConfig.options?.[0] ?? '');
+          newCellRow.push({ value });
+        }
+      });
+
+      newGrid.push(newCellRow);
+    });
+
+    this.columnConfig().set(finalConfig);
+    this.data().set(newGrid);
+    this.activeCell.set(null);
+    this.selectionRanges.set([]);
+  }
+
+  private _inferColumnType(data: string[][], colIndex: number): any {
+    let allCheckboxes = true;
+    let allNumbers = true;
+    let hasData = false;
+
+    for (const row of data) {
+      const val = (row[colIndex] ?? '').trim();
+      if (!val) continue;
+      hasData = true;
+
+      const lowerVal = val.toLowerCase();
+      if (!['true', 'false', '1', '0'].includes(lowerVal)) {
+        allCheckboxes = false;
+      }
+
+      const numClean = val.replace(/[\$,]/g, '');
+      const parsedNum = parseFloat(numClean);
+      if (isNaN(parsedNum) || !isFinite(parsedNum)) {
+        allNumbers = false;
+      }
+    }
+
+    if (!hasData) return 'text';
+    if (allCheckboxes) return 'checkbox';
+    if (allNumbers) return 'numeric';
+    return 'text';
+  }
+
   private _toKebabCase = (str: string) => String(str).replace(/([a-z\d])([A-Z])/g, '$1-$2').replace(/[\s_]+/g, '-').toLowerCase();
 }
