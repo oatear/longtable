@@ -1740,7 +1740,7 @@ export class SpreadsheetComponent implements OnDestroy {
     setTimeout(() => this.layoutTick.update(v => v + 1), 0);
   }
 
-  private escapeHtml = (unsafe: string) => unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&quot;").replace(/'/g, "&#039;");
+  private escapeHtml = (unsafe: string) => unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 
   private _createNewRow(): Cell[] {
     return Array.from({ length: this.colsCount() }, (_, c) => {
@@ -1786,8 +1786,15 @@ export class SpreadsheetComponent implements OnDestroy {
     this.validationErrors.set(errors);
   }
 
-  private _convertDataToTSV = (data: Cell[][]) => data.map(row => row.map(cell => { const v = String(cell?.value ?? ''); return v.match(/["\n\t]/) ? `"${v.replace(/"/g, '""')}"` : v; }).join('\t')).join('\n');
-  private _convertDataToCSV = (data: Cell[][]) => data.map(row => row.map(cell => { const v = String(cell?.value ?? ''); return v.match(/["\n\r,]/) ? `"${v.replace(/"/g, '""')}"` : v; }).join(',')).join('\n');
+  private _convertDataToTSV = (data: Cell[][]) => data.map(row => row.map(cell => {
+    const v = String(cell?.value ?? '');
+    return v.match(/["\n\r\t]/) ? `"${v.replace(/"/g, '""')}"` : v;
+  }).join('\t')).join('\n');
+
+  private _convertDataToCSV = (data: Cell[][]) => data.map(row => row.map(cell => {
+    const v = String(cell?.value ?? '');
+    return v.match(/["\n\r,]/) ? `"${v.replace(/"/g, '""')}"` : v;
+  }).join(',')).join('\n');
 
   private async _copySelectionToClipboard() {
     const range = this.activeSelectionRange(); if (!range) return;
@@ -1869,8 +1876,69 @@ export class SpreadsheetComponent implements OnDestroy {
     }
   }
 
-  private _parseTSV(tsv: string): string[][] { /* Complex parser, simplified for brevity */ return tsv.split('\n').map(r => r.split('\t')); }
-  private _parseCSV(csv: string): string[][] { /* Complex parser, simplified for brevity */ return csv.split('\n').map(r => r.split(',')); }
+  private _parseTSV(tsv: string): string[][] { return this._parseDelimitedData(tsv, '\t'); }
+  private _parseCSV(csv: string): string[][] { return this._parseDelimitedData(csv, ','); }
+
+  private _parseDelimitedData(input: string, delimiter: string): string[][] {
+    const rows: string[][] = [];
+    let currentRow: string[] = [];
+    let currentCell = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < input.length; i++) {
+      const char = input[i];
+      const nextChar = input[i + 1];
+
+      if (inQuotes) {
+        if (char === '"') {
+          if (nextChar === '"') {
+            // Escaped quote: "" -> "
+            currentCell += '"';
+            i++;
+          } else {
+            // End of quoted cell
+            inQuotes = false;
+          }
+        } else {
+          // Regular character inside quotes (including delimiters and newlines)
+          currentCell += char;
+        }
+      } else {
+        if (char === '"') {
+          // Start of quoted cell
+          inQuotes = true;
+        } else if (char === delimiter) {
+          // Cell delimiter
+          currentRow.push(currentCell);
+          currentCell = '';
+        } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
+          // Row ending (\n or \r\n)
+          currentRow.push(currentCell);
+          rows.push(currentRow);
+          currentRow = [];
+          currentCell = '';
+          if (char === '\r') i++; // skip \n
+        } else if (char === '\r') {
+          // Row ending (\r only)
+          currentRow.push(currentCell);
+          rows.push(currentRow);
+          currentRow = [];
+          currentCell = '';
+        } else {
+          // Regular character
+          currentCell += char;
+        }
+      }
+    }
+
+    // Handle last cell/row if not already handled
+    if (currentRow.length > 0 || currentCell !== '') {
+      currentRow.push(currentCell);
+      rows.push(currentRow);
+    }
+
+    return rows;
+  }
   private getCoordsFromTarget = (t: HTMLElement): Coordinates | null => { const c = t.closest('td[data-row][data-col]'); return c ? { row: parseInt(c.getAttribute('data-row')!), col: parseInt(c.getAttribute('data-col')!) } : null; }
   private normalizeRange = (r: { start: Coordinates, end: Coordinates }) => ({ start: { row: Math.min(r.start.row, r.end.row), col: Math.min(r.start.col, r.end.col) }, end: { row: Math.max(r.start.row, r.end.row), col: Math.max(r.start.col, r.end.col) } });
 
